@@ -1,6 +1,17 @@
 [explorer]
 tile_width = 12
 tile_height = 6
+double_click_delay = 400
+
+[colors]
+background = "#1a1b26"
+foreground = "#c0caf5"
+accent = "#7aa2f7"
+error = "#f7768e"
+selected = "#e0af68"
+border = "#414868"
+border_muted = "#565f89"
+purple = "#bb9af7"
 
 [[places]]
 path = "/home/edward/Desktop"

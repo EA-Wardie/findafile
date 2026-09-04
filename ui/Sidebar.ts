@@ -1,4 +1,5 @@
 import { BoxRenderable, CliRenderer } from "@opentui/core";
+import config from "../config.toml";
 
 export class Sidebar {
   private static _sidebar: BoxRenderable;
@@ -9,9 +10,9 @@ export class Sidebar {
       height: "100%",
       border: true,
       borderStyle: "single",
-      borderColor: "#414868",
+      borderColor: config.colors.border,
       title: "Places",
-      titleColor: "#bb9af7",
+      titleColor: config.colors.purple,
       flexDirection: "column",
     });
 

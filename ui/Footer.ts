@@ -1,4 +1,5 @@
 import { BoxRenderable, CliRenderer } from "@opentui/core";
+import config from "../config.toml";
 
 export class Footer {
   private static _footer: BoxRenderable;
@@ -9,7 +10,7 @@ export class Footer {
       height: 3,
       border: true,
       borderStyle: "single",
-      borderColor: "#414868",
+      borderColor: config.colors.border,
       paddingLeft: 1,
       alignItems: "center",
     });

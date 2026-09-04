@@ -3,11 +3,9 @@ import { readdirSync, type Dirent } from "node:fs";
 import { dirname, join } from "node:path";
 import {
   BoxRenderable,
-  ScrollBoxRenderable,
   TextAttributes,
   TextRenderable,
   type KeyEvent,
-  type ScrollBoxRenderable as ScrollBoxRenderableType,
 } from "@opentui/core";
 import type { Entry, ReadEntriesResult, ShortcutType } from "./types.ts";
 import { Renderer } from "./ui/Renderer.ts";
@@ -22,14 +20,6 @@ import { Content } from "./ui/Content.ts";
 import { Explorer } from "./ui/Explorer.ts";
 import { UpTile } from "./ui/UpTile.ts";
 import { DownTile } from "./ui/DownTile.ts";
-
-const PLACES: ShortcutType[] = config.places || [];
-const BOOKMARKS: ShortcutType[] = config.bookmarks || [];
-const DRIVES: ShortcutType[] = config.drives || [];
-const DOUBLE_CLICK_MS: number = 400;
-const TILE_WIDTH: number = 12;
-const TILE_HEIGHT: number = Math.floor(TILE_WIDTH * 0.56);
-const SELECTED_BORDER_COLOR: string = "#e0af68";
 
 function readEntries(path: string): ReadEntriesResult {
   try {
@@ -65,7 +55,7 @@ const header = Header.make(renderer);
 const currentPathText = new TextRenderable(renderer, {
   content: Store.currentPath,
   attributes: TextAttributes.BOLD,
-  fg: "#c0caf5",
+  fg: config.colors.foreground,
 });
 
 header.add(currentPathText);
@@ -78,7 +68,7 @@ const footer = Footer.make(renderer);
 
 const footerText = new TextRenderable(renderer, {
   content: "No log",
-  fg: "#565f89",
+  fg: config.colors.border_muted,
 });
 
 root.add(header);
@@ -107,8 +97,18 @@ function navigate(path: string): void {
 function makeUpTile(parent: string): BoxRenderable {
   const tile = UpTile.make(renderer);
 
-  tile.add(new TextRenderable(renderer, { content: "📁", fg: "#565f89" }));
-  tile.add(new TextRenderable(renderer, { content: "..", fg: "#565f89" }));
+  tile.add(
+    new TextRenderable(renderer, {
+      content: "📁",
+      fg: config.colors.border_muted,
+    }),
+  );
+  tile.add(
+    new TextRenderable(renderer, {
+      content: "..",
+      fg: config.colors.border_muted,
+    }),
+  );
   tile.onMouseDown = (): void => navigate(parent);
 
   return tile;
@@ -121,20 +121,20 @@ function makeTile(
 ): BoxRenderable {
   const tile = DownTile.make(renderer);
 
-  tile.borderColor = SELECTED_BORDER_COLOR;
+  tile.borderColor = config.colors.selected;
   tile.border = false;
 
   tile.add(
     new TextRenderable(renderer, {
       content: isDir ? "📁" : "📄",
-      fg: isDir ? "#7aa2f7" : "#c0caf5",
+      fg: isDir ? config.colors.accent : config.colors.foreground,
     }),
   );
 
   tile.add(
     new TextRenderable(renderer, {
-      content: truncate(label, TILE_WIDTH - 4),
-      fg: isDir ? "#7aa2f7" : "#c0caf5",
+      content: truncate(label, config.explorer.tile_width - 4),
+      fg: isDir ? config.colors.accent : config.colors.foreground,
     }),
   );
 
@@ -145,7 +145,7 @@ function makeTile(
       isDir &&
       Store.lastClick !== null &&
       Store.lastClick.path === fullPath &&
-      now - Store.lastClick.time < DOUBLE_CLICK_MS;
+      now - Store.lastClick.time < config.explorer.double_click_delay;
 
     if (isDoubleClick) {
       navigate(fullPath);
@@ -177,7 +177,7 @@ function renderExplorer(): void {
     explorer.add(
       new TextRenderable(renderer, {
         content: `Error: ${error}`,
-        fg: "#f7768e",
+        fg: config.colors.error,
       }),
     );
 
@@ -192,7 +192,10 @@ function renderExplorer(): void {
 
   if (entries.length === 0) {
     explorer.add(
-      new TextRenderable(renderer, { content: "(empty)", fg: "#565f89" }),
+      new TextRenderable(renderer, {
+        content: "(empty)",
+        fg: config.colors.border_muted,
+      }),
     );
   }
 
@@ -212,11 +215,14 @@ function makeShortcut(shortcut: ShortcutType): BoxRenderable {
 }
 
 function renderPlaces(): void {
-  for (const place of PLACES) {
+  for (const place of config.places || []) {
     const placeBox = makeShortcut(place);
 
     placeBox.add(
-      new TextRenderable(renderer, { content: place.label, fg: "#bb9af7" }),
+      new TextRenderable(renderer, {
+        content: place.label,
+        fg: config.colors.purple,
+      }),
     );
 
     sidebar.add(placeBox);
@@ -224,11 +230,14 @@ function renderPlaces(): void {
 }
 
 function renderBookmarks(): void {
-  for (const bookmark of BOOKMARKS) {
+  for (const bookmark of config.bookmarks || []) {
     const bookmarkBox = makeShortcut(bookmark);
 
     bookmarkBox.add(
-      new TextRenderable(renderer, { content: bookmark.label, fg: "#bb9af7" }),
+      new TextRenderable(renderer, {
+        content: bookmark.label,
+        fg: config.colors.purple,
+      }),
     );
 
     sidebar.add(bookmarkBox);
@@ -236,11 +245,14 @@ function renderBookmarks(): void {
 }
 
 function renderDrives(): void {
-  for (const drive of DRIVES) {
+  for (const drive of config.drives || []) {
     const driveBox = makeShortcut(drive);
 
     driveBox.add(
-      new TextRenderable(renderer, { content: drive.label, fg: "#bb9af7" }),
+      new TextRenderable(renderer, {
+        content: drive.label,
+        fg: config.colors.purple,
+      }),
     );
 
     sidebar.add(driveBox);

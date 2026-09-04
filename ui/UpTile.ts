@@ -9,7 +9,7 @@ export class UpTile {
       width: config.explorer.tile_width,
       height: config.explorer.tile_height,
       border: true,
-      borderColor: "#565f89",
+      borderColor: config.colors.border_muted,
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",

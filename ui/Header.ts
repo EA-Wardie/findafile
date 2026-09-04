@@ -1,4 +1,5 @@
 import { BoxRenderable, CliRenderer, Renderable } from "@opentui/core";
+import config from "../config.toml";
 
 export class Header {
   private static _header: BoxRenderable;
@@ -9,8 +10,8 @@ export class Header {
       height: 3,
       border: true,
       borderStyle: "single",
-      borderColor: "#414868",
-      titleColor: "#7aa2f7",
+      borderColor: config.colors.border,
+      titleColor: config.colors.accent,
       paddingLeft: 1,
       flexDirection: "row",
       alignItems: "center",

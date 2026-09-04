@@ -1,4 +1,5 @@
 import { BoxRenderable, CliRenderer } from "@opentui/core";
+import config from "../config.toml";
 
 export class Content {
   private static _content: BoxRenderable;
@@ -8,9 +9,9 @@ export class Content {
       flexGrow: 1,
       height: "100%",
       border: true,
-      borderColor: "#414868",
+      borderColor: config.colors.border,
       title: "Files",
-      titleColor: "#7aa2f7",
+      titleColor: config.colors.accent,
       flexDirection: "column",
     });
 

@@ -1,4 +1,5 @@
 import { CliRenderer, createCliRenderer, Renderable } from "@opentui/core";
+import config from "../config.toml";
 
 export class Renderer {
   private static _renderer: CliRenderer;
@@ -6,7 +7,7 @@ export class Renderer {
   public static async make(): Promise<CliRenderer> {
     this._renderer = await createCliRenderer({
       exitOnCtrlC: true,
-      backgroundColor: "#1a1b26",
+      backgroundColor: config.colors.background,
     });
 
     return this._renderer;

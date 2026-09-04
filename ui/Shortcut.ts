@@ -1,4 +1,5 @@
 import { BoxRenderable, CliRenderer } from "@opentui/core";
+import config from "../config.toml";
 
 export class Shortcut {
   private static _shortcut: BoxRenderable;
@@ -8,7 +9,7 @@ export class Shortcut {
       width: "100%",
       height: 1,
       border: ["left"],
-      borderColor: "#bb9af7",
+      borderColor: config.colors.purple,
       paddingLeft: 1,
       marginBottom: 1,
     });
