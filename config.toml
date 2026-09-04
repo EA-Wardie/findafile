@@ -16,35 +16,44 @@ purple = "#bb9af7"
 [[places]]
 path = "/home/edward/Desktop"
 label = "Desktop"
+icon = "📁"
 
 [[places]]
 path = "/home/edward/Downloads"
 label = "Downloads"
+icon = "📁"
 
 [[places]]
 path = "/home/edward/Documents"
 label = "Documents"
+icon = "📁"
 
 [[places]]
 path = "/home/edward/Music"
 label = "Music"
+icon = "📁"
 
 [[places]]
 path = "/home/edward/Videos"
 label = "Videos"
+icon = "📁"
 
 [[places]]
 path = "/home/edward/Pictures"
 label = "Pictures"
+icon = "📁"
 
 [[bookmarks]]
 path = "/home/edward/Projects"
 label = "Projects"
+icon = "🔖"
 
 [[bookmarks]]
 path = "/home/edward/Certificates"
 label = "Certificates"
+icon = "🔖"
 
 [[drives]]
 path = "/"
 label = "root"
+icon = "💾"

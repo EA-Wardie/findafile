@@ -10,7 +10,7 @@ export class Content {
       height: "100%",
       border: true,
       borderColor: config.colors.border,
-      title: "Files",
+      title: "Explorer",
       titleColor: config.colors.accent,
       flexDirection: "column",
     });

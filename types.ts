@@ -1,19 +1,20 @@
 export interface ShortcutType {
   label: string;
   path: string;
+  icon: string;
 }
 
-export interface Entry {
+export interface EntryType {
   name: string;
   isDir: boolean;
 }
 
-export interface ReadEntriesResult {
-  entries: Entry[];
+export interface ReadEntriesResultType {
+  entries: EntryType[];
   error?: string;
 }
 
-export interface LastClick {
+export interface LastClickType {
   path: string;
   time: number;
 }

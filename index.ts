@@ -7,7 +7,7 @@ import {
   TextRenderable,
   type KeyEvent,
 } from "@opentui/core";
-import type { Entry, ReadEntriesResult, ShortcutType } from "./types.ts";
+import type { EntryType, ReadEntriesResultType, ShortcutType } from "./types.ts";
 import { Renderer } from "./ui/Renderer.ts";
 import { Root } from "./ui/Root.ts";
 import { Header } from "./ui/Header.ts";
@@ -20,17 +20,18 @@ import { Content } from "./ui/Content.ts";
 import { Explorer } from "./ui/Explorer.ts";
 import { UpTile } from "./ui/UpTile.ts";
 import { DownTile } from "./ui/DownTile.ts";
+import { SidebarSection } from "./ui/SidebarSection.ts";
 
-function readEntries(path: string): ReadEntriesResult {
+function readEntries(path: string): ReadEntriesResultType {
   try {
     const dirents: Dirent[] = readdirSync(path, { withFileTypes: true });
 
-    const entries: Entry[] = dirents
-      .map((dirent: Dirent): Entry => ({
+    const entries: EntryType[] = dirents
+      .map((dirent: Dirent): EntryType => ({
         name: dirent.name,
         isDir: dirent.isDirectory(),
       }))
-      .sort((a: Entry, b: Entry): number => {
+      .sort((a: EntryType, b: EntryType): number => {
         if (a.isDir !== b.isDir) {
           return a.isDir ? -1 : 1;
         }
@@ -62,6 +63,9 @@ header.add(currentPathText);
 
 const main = Main.make(renderer);
 const sidebar = Sidebar.make(renderer);
+const placesBox = SidebarSection.make(renderer, "Places");
+const bookmarksBox = SidebarSection.make(renderer, "Bookmarks");
+const drivesBox = SidebarSection.make(renderer, "Drives");
 const content = Content.make(renderer);
 const explorer = Explorer.make(renderer);
 const footer = Footer.make(renderer);
@@ -78,6 +82,10 @@ root.add(footer);
 main.add(sidebar);
 main.add(content);
 
+sidebar.add(placesBox);
+sidebar.add(bookmarksBox);
+sidebar.add(drivesBox);
+
 content.add(explorer);
 footer.add(footerText);
 
@@ -92,6 +100,7 @@ function navigate(path: string): void {
   currentPathText.content = path;
 
   renderExplorer();
+  updateShortcutSelection();
 }
 
 function makeUpTile(parent: string): BoxRenderable {
@@ -103,12 +112,14 @@ function makeUpTile(parent: string): BoxRenderable {
       fg: config.colors.border_muted,
     }),
   );
+
   tile.add(
     new TextRenderable(renderer, {
       content: "..",
       fg: config.colors.border_muted,
     }),
   );
+
   tile.onMouseDown = (): void => navigate(parent);
 
   return tile;
@@ -171,7 +182,7 @@ function renderExplorer(): void {
     explorer.remove(child);
   }
 
-  const { entries, error }: ReadEntriesResult = readEntries(Store.currentPath);
+  const { entries, error }: ReadEntriesResultType = readEntries(Store.currentPath);
 
   if (error !== undefined) {
     explorer.add(
@@ -206,10 +217,29 @@ function renderExplorer(): void {
   }
 }
 
+const shortcutEntries: { shortcut: ShortcutType; box: BoxRenderable }[] = [];
+
+function updateShortcutSelection(): void {
+  const selected: ShortcutType | null =
+    shortcutEntries.find((entry) => entry.shortcut.path === Store.currentPath)
+      ?.shortcut ?? null;
+
+  Store.setSelectedShortcut(selected);
+
+  for (const entry of shortcutEntries) {
+    entry.box.border =
+      entry.shortcut.path === Store.currentPath ? ["left"] : false;
+  }
+}
+
 function makeShortcut(shortcut: ShortcutType): BoxRenderable {
   const shortcutBox = Shortcut.make(renderer);
 
+  shortcutBox.borderColor = config.colors.purple;
+  shortcutBox.border = false;
   shortcutBox.onMouseDown = (): void => navigate(shortcut.path);
+
+  shortcutEntries.push({ shortcut, box: shortcutBox });
 
   return shortcutBox;
 }
@@ -220,12 +250,12 @@ function renderPlaces(): void {
 
     placeBox.add(
       new TextRenderable(renderer, {
-        content: place.label,
+        content: `${place.icon} ${place.label}`,
         fg: config.colors.purple,
       }),
     );
 
-    sidebar.add(placeBox);
+    placesBox.add(placeBox);
   }
 }
 
@@ -235,12 +265,12 @@ function renderBookmarks(): void {
 
     bookmarkBox.add(
       new TextRenderable(renderer, {
-        content: bookmark.label,
+        content: `${bookmark.icon} ${bookmark.label}`,
         fg: config.colors.purple,
       }),
     );
 
-    sidebar.add(bookmarkBox);
+    bookmarksBox.add(bookmarkBox);
   }
 }
 
@@ -250,12 +280,12 @@ function renderDrives(): void {
 
     driveBox.add(
       new TextRenderable(renderer, {
-        content: drive.label,
+        content: `${drive.icon} ${drive.label}`,
         fg: config.colors.purple,
       }),
     );
 
-    sidebar.add(driveBox);
+    drivesBox.add(driveBox);
   }
 }
 
@@ -267,6 +297,7 @@ function renderSidebar(): void {
 
 renderSidebar();
 renderExplorer();
+updateShortcutSelection();
 
 renderer.keyInput.on("keypress", (key: KeyEvent): void => {
   if (key.name === "q") {
