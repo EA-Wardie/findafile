@@ -1,11 +1,11 @@
 import type { BoxRenderable } from "@opentui/core";
-import type { LastClick, ShortcutType } from "../types";
+import type { LastClickType, ShortcutType } from "../types";
 import { homedir } from "node:os";
 
 export class Store {
   public static selectedTile: BoxRenderable | null = null;
   public static selectedShortcut: ShortcutType | null = null;
-  public static lastClick: LastClick | null = null;
+  public static lastClick: LastClickType | null = null;
   public static currentPath: string = homedir();
 
   public static setSelectedTile(selectedTile: BoxRenderable | null) {
@@ -16,7 +16,7 @@ export class Store {
     this.selectedShortcut = shortcut;
   }
 
-  public static setLastClick(lastClick: LastClick | null) {
+  public static setLastClick(lastClick: LastClickType | null) {
     this.lastClick = lastClick;
   }
 

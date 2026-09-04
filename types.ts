@@ -18,3 +18,8 @@ export interface LastClickType {
   path: string;
   time: number;
 }
+
+export interface ContextMenuItemType {
+  label: string;
+  onSelect: () => void;
+}

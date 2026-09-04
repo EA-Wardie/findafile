@@ -6,8 +6,14 @@ import {
   TextAttributes,
   TextRenderable,
   type KeyEvent,
+  type MouseEvent,
 } from "@opentui/core";
-import type { EntryType, ReadEntriesResultType, ShortcutType } from "./types.ts";
+import type {
+  ContextMenuItemType,
+  EntryType,
+  ReadEntriesResultType,
+  ShortcutType,
+} from "./types.ts";
 import { Renderer } from "./ui/Renderer.ts";
 import { Root } from "./ui/Root.ts";
 import { Header } from "./ui/Header.ts";
@@ -21,6 +27,7 @@ import { Explorer } from "./ui/Explorer.ts";
 import { UpTile } from "./ui/UpTile.ts";
 import { DownTile } from "./ui/DownTile.ts";
 import { SidebarSection } from "./ui/SidebarSection.ts";
+import { ContextMenu } from "./ui/ContextMenu.ts";
 
 function readEntries(path: string): ReadEntriesResultType {
   try {
@@ -52,6 +59,8 @@ function truncate(name: string, maxLen: number): string {
 const renderer = await Renderer.make();
 const root = Root.make(renderer);
 const header = Header.make(renderer);
+
+ContextMenu.make(renderer);
 
 const currentPathText = new TextRenderable(renderer, {
   content: Store.currentPath,
@@ -149,7 +158,52 @@ function makeTile(
     }),
   );
 
-  tile.onMouseDown = (): void => {
+  tile.onMouseDown = (event: MouseEvent): void => {
+    if (event.button === 2) {
+      const items: ContextMenuItemType[] = [
+        {
+          label: "Copy path",
+          onSelect: (): void => {
+            renderer.copyToClipboardOSC52(fullPath);
+          },
+        },
+      ];
+
+      if (isDir) {
+        items.push({
+          label: "Open",
+          onSelect: (): void => navigate(fullPath),
+        });
+      }
+
+      items.push({
+        label: "Copy",
+        onSelect: (): void => {},
+      });
+
+      items.push({
+        label: "Cut",
+        onSelect: (): void => {},
+      });
+
+      items.push({
+        label: "Delete",
+        onSelect: (): void => {},
+      });
+
+      ContextMenu.show(items, event.x, event.y);
+
+      if (Store.selectedTile !== null && Store.selectedTile !== tile) {
+        Store.selectedTile.border = false;
+      }
+
+      tile.border = true;
+
+      Store.setSelectedTile(tile);
+
+      return;
+    }
+
     const now: number = Date.now();
 
     const isDoubleClick: boolean =
@@ -182,7 +236,9 @@ function renderExplorer(): void {
     explorer.remove(child);
   }
 
-  const { entries, error }: ReadEntriesResultType = readEntries(Store.currentPath);
+  const { entries, error }: ReadEntriesResultType = readEntries(
+    Store.currentPath,
+  );
 
   if (error !== undefined) {
     explorer.add(
@@ -237,7 +293,11 @@ function makeShortcut(shortcut: ShortcutType): BoxRenderable {
 
   shortcutBox.borderColor = config.colors.purple;
   shortcutBox.border = false;
-  shortcutBox.onMouseDown = (): void => navigate(shortcut.path);
+  shortcutBox.onMouseDown = (event: MouseEvent): void => {
+    if (event.button === 0) {
+      navigate(shortcut.path);
+    }
+  };
 
   shortcutEntries.push({ shortcut, box: shortcutBox });
 
