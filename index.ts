@@ -1,50 +1,34 @@
+import config from "./config.toml";
 import { readdirSync, type Dirent } from "node:fs";
-import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import {
   BoxRenderable,
   ScrollBoxRenderable,
   TextAttributes,
   TextRenderable,
-  createCliRenderer,
-  type CliRenderer,
   type KeyEvent,
   type ScrollBoxRenderable as ScrollBoxRenderableType,
 } from "@opentui/core";
+import type { Entry, ReadEntriesResult, ShortcutType } from "./types.ts";
+import { Renderer } from "./ui/Renderer.ts";
+import { Root } from "./ui/Root.ts";
+import { Header } from "./ui/Header.ts";
+import { Main } from "./ui/Main.ts";
+import { Footer } from "./ui/Footer.ts";
+import { Sidebar } from "./ui/Sidebar.ts";
+import { Store } from "./lib/Store.ts";
+import { Shortcut } from "./ui/Shortcut.ts";
+import { Content } from "./ui/Content.ts";
+import { Explorer } from "./ui/Explorer.ts";
+import { UpTile } from "./ui/UpTile.ts";
+import { DownTile } from "./ui/DownTile.ts";
 
-interface Shortcut {
-  label: string;
-  path: string;
-}
-
-interface Entry {
-  name: string;
-  isDir: boolean;
-}
-
-interface ReadEntriesResult {
-  entries: Entry[];
-  error?: string;
-}
-
-interface LastClick {
-  path: string;
-  time: number;
-}
-
-const HOME: string = homedir();
-
-const SHORTCUTS: Shortcut[] = [
-  { label: "Home", path: HOME },
-  { label: "Documents", path: join(HOME, "Documents") },
-  { label: "Downloads", path: join(HOME, "Downloads") },
-  { label: "Desktop", path: join(HOME, "Desktop") },
-  { label: "Root", path: "/" },
-];
-
+const PLACES: ShortcutType[] = config.places || [];
+const BOOKMARKS: ShortcutType[] = config.bookmarks || [];
+const DRIVES: ShortcutType[] = config.drives || [];
 const DOUBLE_CLICK_MS: number = 400;
 const TILE_WIDTH: number = 12;
-const TILE_HEIGHT: number = 6;
+const TILE_HEIGHT: number = Math.floor(TILE_WIDTH * 0.56);
 const SELECTED_BORDER_COLOR: string = "#e0af68";
 
 function readEntries(path: string): ReadEntriesResult {
@@ -52,7 +36,10 @@ function readEntries(path: string): ReadEntriesResult {
     const dirents: Dirent[] = readdirSync(path, { withFileTypes: true });
 
     const entries: Entry[] = dirents
-      .map((d: Dirent): Entry => ({ name: d.name, isDir: d.isDirectory() }))
+      .map((dirent: Dirent): Entry => ({
+        name: dirent.name,
+        isDir: dirent.isDirectory(),
+      }))
       .sort((a: Entry, b: Entry): number => {
         if (a.isDir !== b.isDir) {
           return a.isDir ? -1 : 1;
@@ -71,165 +58,60 @@ function truncate(name: string, maxLen: number): string {
   return name.length > maxLen ? `${name.slice(0, maxLen - 1)}…` : name;
 }
 
-const renderer: CliRenderer = await createCliRenderer({
-  exitOnCtrlC: true,
-  backgroundColor: "#1a1b26",
-});
+const renderer = await Renderer.make();
+const root = Root.make(renderer);
+const header = Header.make(renderer);
 
-let currentPath: string = HOME;
-let selectedTile: BoxRenderable | null = null;
-let lastClick: LastClick | null = null;
-
-const root: BoxRenderable = new BoxRenderable(renderer, {
-  width: "100%",
-  height: "100%",
-  flexDirection: "column",
-  padding: 0,
-  gap: 0,
-});
-
-const pathBar: TextRenderable = new TextRenderable(renderer, {
-  content: currentPath,
-  fg: "#c0caf5",
+const currentPathText = new TextRenderable(renderer, {
+  content: Store.currentPath,
   attributes: TextAttributes.BOLD,
+  fg: "#c0caf5",
 });
 
-const backButtonIcon: TextRenderable = new TextRenderable(renderer, {
-  content: "⬅️",
-  fg: "#7aa2f7",
+header.add(currentPathText);
+
+const main = Main.make(renderer);
+const sidebar = Sidebar.make(renderer);
+const content = Content.make(renderer);
+const explorer = Explorer.make(renderer);
+const footer = Footer.make(renderer);
+
+const footerText = new TextRenderable(renderer, {
+  content: "No log",
+  fg: "#565f89",
 });
 
-const backButton: BoxRenderable = new BoxRenderable(renderer, {
-  width: 2,
-  height: 1,
-  onMouseDown: (): void => {
-    const parent: string = dirname(currentPath);
-
-    if (parent !== currentPath) {
-      navigate(parent);
-    }
-  },
-});
-backButton.add(backButtonIcon);
-
-const pathBarBox: BoxRenderable = new BoxRenderable(renderer, {
-  width: "100%",
-  height: 3,
-  border: true,
-  borderStyle: "single",
-  borderColor: "#414868",
-  titleColor: "#7aa2f7",
-  paddingLeft: 1,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "flex-start",
-  gap: 1,
-});
-
-pathBarBox.add(backButton);
-pathBarBox.add(pathBar);
-
-const mainRow: BoxRenderable = new BoxRenderable(renderer, {
-  width: "100%",
-  flexGrow: 1,
-  flexDirection: "row",
-  gap: 1,
-});
-
-const sidebar: BoxRenderable = new BoxRenderable(renderer, {
-  width: 28,
-  height: "100%",
-  border: true,
-  borderStyle: "single",
-  borderColor: "#414868",
-  title: "Places",
-  titleColor: "#bb9af7",
-  flexDirection: "column",
-  padding: 0,
-});
-
-const explorerBox: BoxRenderable = new BoxRenderable(renderer, {
-  flexGrow: 1,
-  height: "100%",
-  border: true,
-  borderStyle: "single",
-  borderColor: "#414868",
-  title: "Files",
-  titleColor: "#7aa2f7",
-  flexDirection: "column",
-  padding: 0,
-});
-
-const explorer: ScrollBoxRenderableType = new ScrollBoxRenderable(renderer, {
-  width: "100%",
-  height: "100%",
-  contentOptions: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 0,
-  },
-}) as ScrollBoxRenderableType;
-
-explorerBox.add(explorer);
-
-const footer: BoxRenderable = new BoxRenderable(renderer, {
-  width: "100%",
-  height: 3,
-  border: true,
-  borderStyle: "single",
-  borderColor: "#414868",
-  paddingLeft: 1,
-  alignItems: "center",
-});
-
-footer.add(
-  new TextRenderable(renderer, {
-    content: "Double clikc a folder to open it | q to quit",
-    fg: "#565f89",
-  }),
-);
-
-mainRow.add(sidebar);
-mainRow.add(explorerBox);
-root.add(pathBarBox);
-root.add(mainRow);
+root.add(header);
+root.add(main);
 root.add(footer);
+
+main.add(sidebar);
+main.add(content);
+
+content.add(explorer);
+footer.add(footerText);
+
 renderer.root.add(root);
 
-function updateBackButtonState(): void {
-  const parent: string = dirname(currentPath);
-  const hasParent: boolean = parent !== currentPath;
-
-  backButtonIcon.fg = hasParent ? "#7aa2f7" : "#414868";
-}
-
 function navigate(path: string): void {
-  currentPath = path;
-  pathBar.content = currentPath;
-  selectedTile = null;
-  lastClick = null;
+  Store.setCurrentPath(path);
+  Store.setSelectedTile(null);
+  Store.setLastClick(null);
 
-  updateBackButtonState();
+  footerText.content = path;
+  currentPathText.content = path;
+
   renderExplorer();
 }
 
 function makeUpTile(parent: string): BoxRenderable {
-  const upTile: BoxRenderable = new BoxRenderable(renderer, {
-    width: TILE_WIDTH,
-    height: TILE_HEIGHT,
-    border: true,
-    borderStyle: "single",
-    borderColor: "#565f89",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    onMouseDown: (): void => navigate(parent),
-  });
+  const tile = UpTile.make(renderer);
 
-  upTile.add(new TextRenderable(renderer, { content: "📁", fg: "#565f89" }));
-  upTile.add(new TextRenderable(renderer, { content: "..", fg: "#565f89" }));
+  tile.add(new TextRenderable(renderer, { content: "📁", fg: "#565f89" }));
+  tile.add(new TextRenderable(renderer, { content: "..", fg: "#565f89" }));
+  tile.onMouseDown = (): void => navigate(parent);
 
-  return upTile;
+  return tile;
 }
 
 function makeTile(
@@ -237,36 +119,7 @@ function makeTile(
   isDir: boolean,
   fullPath: string,
 ): BoxRenderable {
-  const tile: BoxRenderable = new BoxRenderable(renderer, {
-    width: TILE_WIDTH,
-    height: TILE_HEIGHT,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    onMouseDown: (): void => {
-      const now: number = Date.now();
-
-      const isDoubleClick: boolean =
-        isDir &&
-        lastClick !== null &&
-        lastClick.path === fullPath &&
-        now - lastClick.time < DOUBLE_CLICK_MS;
-
-      if (isDoubleClick) {
-        navigate(fullPath);
-
-        return;
-      }
-
-      if (selectedTile !== null && selectedTile !== tile) {
-        selectedTile.border = false;
-      }
-
-      tile.border = true;
-      selectedTile = tile;
-      lastClick = { path: fullPath, time: now };
-    },
-  });
+  const tile = DownTile.make(renderer);
 
   tile.borderColor = SELECTED_BORDER_COLOR;
   tile.border = false;
@@ -284,6 +137,32 @@ function makeTile(
       fg: isDir ? "#7aa2f7" : "#c0caf5",
     }),
   );
+
+  tile.onMouseDown = (): void => {
+    const now: number = Date.now();
+
+    const isDoubleClick: boolean =
+      isDir &&
+      Store.lastClick !== null &&
+      Store.lastClick.path === fullPath &&
+      now - Store.lastClick.time < DOUBLE_CLICK_MS;
+
+    if (isDoubleClick) {
+      navigate(fullPath);
+
+      return;
+    }
+
+    if (Store.selectedTile !== null && Store.selectedTile !== tile) {
+      Store.selectedTile.border = false;
+    }
+
+    tile.border = true;
+
+    Store.setSelectedTile(tile);
+    Store.setLastClick({ path: fullPath, time: now });
+  };
+
   return tile;
 }
 
@@ -292,7 +171,7 @@ function renderExplorer(): void {
     explorer.remove(child);
   }
 
-  const { entries, error }: ReadEntriesResult = readEntries(currentPath);
+  const { entries, error }: ReadEntriesResult = readEntries(Store.currentPath);
 
   if (error !== undefined) {
     explorer.add(
@@ -305,9 +184,9 @@ function renderExplorer(): void {
     return;
   }
 
-  const parent: string = dirname(currentPath);
+  const parent: string = dirname(Store.currentPath);
 
-  if (parent !== currentPath) {
+  if (parent !== Store.currentPath) {
     explorer.add(makeUpTile(parent));
   }
 
@@ -318,40 +197,63 @@ function renderExplorer(): void {
   }
 
   for (const entry of entries) {
-    const fullPath: string = join(currentPath, entry.name);
+    const fullPath: string = join(Store.currentPath, entry.name);
 
     explorer.add(makeTile(entry.name, entry.isDir, fullPath));
   }
 }
 
-function renderSidebar(): void {
-  for (const shortcut of SHORTCUTS) {
-    const { error }: ReadEntriesResult = readEntries(shortcut.path);
+function makeShortcut(shortcut: ShortcutType): BoxRenderable {
+  const shortcutBox = Shortcut.make(renderer);
 
-    if (error !== undefined) {
-      continue;
-    }
+  shortcutBox.onMouseDown = (): void => navigate(shortcut.path);
 
-    const row: BoxRenderable = new BoxRenderable(renderer, {
-      width: "100%",
-      height: 1,
-      border: ["left"],
-      borderColor: "#bb9af7",
-      paddingLeft: 1,
-      marginBottom: 1,
-      onMouseDown: (): void => navigate(shortcut.path),
-    });
+  return shortcutBox;
+}
 
-    row.add(
-      new TextRenderable(renderer, { content: shortcut.label, fg: "#bb9af7" }),
+function renderPlaces(): void {
+  for (const place of PLACES) {
+    const placeBox = makeShortcut(place);
+
+    placeBox.add(
+      new TextRenderable(renderer, { content: place.label, fg: "#bb9af7" }),
     );
 
-    sidebar.add(row);
+    sidebar.add(placeBox);
   }
 }
 
+function renderBookmarks(): void {
+  for (const bookmark of BOOKMARKS) {
+    const bookmarkBox = makeShortcut(bookmark);
+
+    bookmarkBox.add(
+      new TextRenderable(renderer, { content: bookmark.label, fg: "#bb9af7" }),
+    );
+
+    sidebar.add(bookmarkBox);
+  }
+}
+
+function renderDrives(): void {
+  for (const drive of DRIVES) {
+    const driveBox = makeShortcut(drive);
+
+    driveBox.add(
+      new TextRenderable(renderer, { content: drive.label, fg: "#bb9af7" }),
+    );
+
+    sidebar.add(driveBox);
+  }
+}
+
+function renderSidebar(): void {
+  renderPlaces();
+  renderBookmarks();
+  renderDrives();
+}
+
 renderSidebar();
-updateBackButtonState();
 renderExplorer();
 
 renderer.keyInput.on("keypress", (key: KeyEvent): void => {

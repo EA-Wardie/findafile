@@ -1,1 +1,39 @@
-start_directory = "/home/edward"
+[explorer]
+tile_width = 12
+tile_height = 6
+
+[[places]]
+path = "/home/edward/Desktop"
+label = "Desktop"
+
+[[places]]
+path = "/home/edward/Downloads"
+label = "Downloads"
+
+[[places]]
+path = "/home/edward/Documents"
+label = "Documents"
+
+[[places]]
+path = "/home/edward/Music"
+label = "Music"
+
+[[places]]
+path = "/home/edward/Videos"
+label = "Videos"
+
+[[places]]
+path = "/home/edward/Pictures"
+label = "Pictures"
+
+[[bookmarks]]
+path = "/home/edward/Projects"
+label = "Projects"
+
+[[bookmarks]]
+path = "/home/edward/Certificates"
+label = "Certificates"
+
+[[drives]]
+path = "/"
+label = "root"
