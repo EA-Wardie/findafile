@@ -1,6 +1,6 @@
 [explorer]
-tile_width = 12
-tile_height = 6
+tile_width = 14
+tile_height = 7
 double_click_delay = 400
 
 [colors]

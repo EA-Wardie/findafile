@@ -25,22 +25,31 @@ export class Sidebar {
     this._sidebar = new BoxRenderable(renderer, {
       width: 28,
       height: "100%",
+      border: true,
+      borderColor: config.colors.border,
       flexDirection: "column",
+      title: "Places",
+      titleColor: config.colors.accent,
     });
 
     this.makeBoxes();
     this.renderPlaces();
     this.renderBookmarks();
     this.renderDrives();
-    this.selectShortcut()
+    this.selectShortcut();
 
     return this._sidebar;
   }
 
   private static makeBoxes(): void {
-    this._placesBox = SidebarSection.make(this._renderer, "Places");
-    this._bookmarksBox = SidebarSection.make(this._renderer, "Bookmarks");
-    this._drivesBox = SidebarSection.make(this._renderer, "Drives");
+    this._placesBox = SidebarSection.make(this._renderer);
+    this._bookmarksBox = SidebarSection.make(this._renderer);
+
+    this._bookmarksBox.marginTop = 1;
+
+    this._drivesBox = SidebarSection.make(this._renderer);
+
+    this._drivesBox.marginTop = 1;
 
     this._sidebar.add(this._placesBox);
     this._sidebar.add(this._bookmarksBox);
@@ -50,8 +59,6 @@ export class Sidebar {
   private static makeShortcut(shortcut: ShortcutType): BoxRenderable {
     const shortcutBox = Shortcut.make(this._renderer);
 
-    shortcutBox.borderColor = config.colors.purple;
-    shortcutBox.border = false;
     shortcutBox.onMouseDown = (event: MouseEvent): void => {
       if (event.button === 0) {
         Navigator.go(shortcut.path);

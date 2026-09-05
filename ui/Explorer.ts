@@ -242,7 +242,9 @@ export class Explorer {
 
     tile.add(
       new TextRenderable(this._renderer, {
-        content: Formatter.truncate(label, config.explorer.tile_width - 4),
+        content: Formatter.truncate(label, config.explorer.tile_width - 2),
+        // maxWidth: config.explorer.tile_width - 2,
+        // content: label,
         fg: isDir ? config.colors.accent : config.colors.foreground,
       }),
     );
