@@ -4,17 +4,12 @@ import { homedir } from "node:os";
 
 export class Store {
   public static selectedTile: BoxRenderable | null = null;
-  public static selectedUpTile: BoxRenderable | null = null;
   public static selectedShortcut: ShortcutType | null = null;
   public static lastClick: LastClickType | null = null;
   public static currentPath: string = homedir();
 
   public static setSelectedTile(tile: BoxRenderable | null) {
     this.selectedTile = tile;
-  }
-
-  public static setSelectedUpTile(tile: BoxRenderable | null) {
-    this.selectedUpTile = tile;
   }
 
   public static setSelectedShortcut(shortcut: ShortcutType | null) {

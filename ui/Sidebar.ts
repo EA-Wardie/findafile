@@ -29,9 +29,9 @@ export class Sidebar {
     });
 
     this.makeBoxes();
-    this.renderPlaces();
-    this.renderBookmarks();
-    this.renderDrives();
+    this.renderSection(config.places, this._placesBox);
+    this.renderSection(config.bookmarks, this._bookmarksBox);
+    this.renderSection(config.drives, this._drivesBox);
     this.updateSelection();
 
     return this._sidebar;
@@ -77,48 +77,21 @@ export class Sidebar {
     Store.setSelectedShortcut(selected);
   }
 
-  private static renderPlaces(): void {
-    (config.places || []).forEach((place: ShortcutType) => {
-      const placeBox = this.makeShortcut(place);
+  private static renderSection(
+    shortcuts: ShortcutType[] | undefined,
+    box: BoxRenderable,
+  ): void {
+    (shortcuts || []).forEach((shortcut: ShortcutType) => {
+      const shortcutBox = this.makeShortcut(shortcut);
 
-      placeBox.add(
+      shortcutBox.add(
         new TextRenderable(this._renderer, {
-          content: `${place.icon} ${place.label}`,
+          content: `${shortcut.icon} ${shortcut.label}`,
           fg: config.colors.foreground,
         }),
       );
 
-      this._placesBox.add(placeBox);
-    });
-  }
-
-  private static renderBookmarks() {
-    (config.bookmarks || []).forEach((bookmark: ShortcutType) => {
-      const bookmarkBox = this.makeShortcut(bookmark);
-
-      bookmarkBox.add(
-        new TextRenderable(this._renderer, {
-          content: `${bookmark.icon} ${bookmark.label}`,
-          fg: config.colors.foreground,
-        }),
-      );
-
-      this._bookmarksBox.add(bookmarkBox);
-    });
-  }
-
-  private static renderDrives() {
-    (config.drives || []).forEach((drive: ShortcutType) => {
-      const driveBox = this.makeShortcut(drive);
-
-      driveBox.add(
-        new TextRenderable(this._renderer, {
-          content: `${drive.icon} ${drive.label}`,
-          fg: config.colors.foreground,
-        }),
-      );
-
-      this._drivesBox.add(driveBox);
+      box.add(shortcutBox);
     });
   }
 }
