@@ -1,5 +1,4 @@
-import { CliRenderer, createCliRenderer, Renderable } from "@opentui/core";
-import config from "../config.toml";
+import { CliRenderer, createCliRenderer } from "@opentui/core";
 
 export class Renderer {
   private static _renderer: CliRenderer;

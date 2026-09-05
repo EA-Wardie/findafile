@@ -18,7 +18,6 @@ import { Input } from "../lib/Input";
 import { readdirSync, type Dirent } from "node:fs";
 import { Navigator } from "../lib/Navigator";
 import { Tile } from "./Tile";
-import { ContextMenu } from "./ContextMenu";
 
 export class Explorer {
   private static _renderer: CliRenderer;
@@ -208,7 +207,11 @@ export class Explorer {
   }
 
   private static makeTile(label: string, isDir: boolean, fullPath: string) {
-    const tile = Tile.make(this._renderer, label, isDir);
+    // const tile = Tile.make(this._renderer, label, isDir);
+    const tile = new Tile(this._renderer, {
+      label,
+      isDir,
+    });
 
     tile.onMouseDown = (event: MouseEvent): void => {
       if (event.button === 2) {
@@ -235,7 +238,7 @@ export class Explorer {
           onSelect: (): void => {},
         });
 
-        ContextMenu.show(items, event.x, event.y);
+        // ContextMenu.show(items, event.x, event.y);
 
         this.selectTile({ tile, fullPath, isDir });
 

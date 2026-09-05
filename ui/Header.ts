@@ -1,51 +1,46 @@
+import config from "../config.toml";
 import {
   BoxRenderable,
-  CliRenderer,
   TextAttributes,
   TextRenderable,
+  type BoxOptions,
+  type RenderContext,
 } from "@opentui/core";
-import config from "../config.toml";
 import { Store } from "../lib/Store";
 
-export class Header {
-  private static _renderer: CliRenderer;
-  private static _header: BoxRenderable;
-  private static _headerText: TextRenderable;
+export interface Options extends BoxOptions {
+  text: string;
+}
 
-  public static make(renderer: CliRenderer): BoxRenderable {
-    this._renderer = renderer;
+export class Header extends BoxRenderable {
+  private leftSection: TextRenderable;
 
-    this._header = new BoxRenderable(this._renderer, {
-      width: "100%",
-      height: 3,
-      border: true,
-      borderStyle: config.border_style,
-      borderColor: config.theme.border,
-      titleColor: config.theme.foreground,
-      paddingLeft: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "flex-start",
-      gap: 1,
-    });
+  constructor(ctx: RenderContext, options: BoxOptions = {}) {
+    super(ctx, options);
 
-    this.makeText();
+    this.width = "100%";
+    this.height = 3;
+    this.border = true;
+    this.borderStyle = config.border_style;
+    this.borderColor = config.theme.border;
+    this.titleColor = config.theme.foreground;
+    this.paddingLeft = 1;
+    this.flexDirection = "row";
+    this.alignItems = "center";
+    this.justifyContent = "flex-start";
+    this.gap = 1;
 
-    return this._header;
-  }
-
-  private static makeText(): void {
-    this._headerText = new TextRenderable(this._renderer, {
+    this.leftSection = new TextRenderable(ctx, {
+      fg: config.theme.foreground,
       content: Store.currentPath,
       attributes: TextAttributes.BOLD,
       selectable: false,
-      fg: config.theme.foreground,
     });
 
-    this._header.add(this._headerText);
-  }
+    this.add(this.leftSection);
 
-  public static setText(content: string): void {
-    this._headerText.content = content;
+    Store.onCurrentPathChange((path: string) => {
+      this.leftSection.content = path;
+    });
   }
 }

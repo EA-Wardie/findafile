@@ -18,7 +18,7 @@ export class ContextMenu {
       width: "100%",
       height: "100%",
       zIndex: 100,
-      onMouseDown: (): void => ContextMenu.hide(),
+      // onMouseDown: (): void => ContextMenu.hide(),
     });
 
     this._menu = new BoxRenderable(renderer, {
@@ -36,7 +36,7 @@ export class ContextMenu {
 
   public static show(items: ContextMenuItemType[], x: number, y: number): void {
     if (this._open) {
-      ContextMenu.hide();
+      // ContextMenu.hide();
     }
 
     this._menu.getChildren().forEach((child) => {
@@ -48,7 +48,7 @@ export class ContextMenu {
         width: "100%",
         marginBottom: index < items.length - 1 ? 1 : 0,
         onMouseDown: (): void => {
-          ContextMenu.hide();
+          // ContextMenu.hide();
           item.onSelect();
         },
       });

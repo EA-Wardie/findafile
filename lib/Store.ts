@@ -8,6 +8,8 @@ export class Store {
   public static lastClick: LastClickType | null = null;
   public static currentPath: string = homedir();
 
+  private static currentPathListeners: ((path: string) => void)[] = [];
+
   public static setSelectedTile(tile: BoxRenderable | null) {
     this.selectedTile = tile;
   }
@@ -22,5 +24,11 @@ export class Store {
 
   public static setCurrentPath(path: string) {
     this.currentPath = path;
+
+    this.currentPathListeners.forEach((listener) => listener(path));
+  }
+
+  public static onCurrentPathChange(listener: (path: string) => void): void {
+    this.currentPathListeners.push(listener);
   }
 }
