@@ -7,13 +7,8 @@ export class Renderer {
   public static async make(): Promise<CliRenderer> {
     this._renderer = await createCliRenderer({
       exitOnCtrlC: true,
-      backgroundColor: config.colors.background,
     });
 
     return this._renderer;
-  }
-
-  public static addRootChild(child: Renderable) {
-    this._renderer.root.add(child);
   }
 }

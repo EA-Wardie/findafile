@@ -23,33 +23,24 @@ export class Sidebar {
     this._renderer = renderer;
 
     this._sidebar = new BoxRenderable(renderer, {
-      width: 28,
+      minWidth: 24,
       height: "100%",
-      border: true,
-      borderColor: config.colors.border,
       flexDirection: "column",
-      title: "Places",
-      titleColor: config.colors.accent,
     });
 
     this.makeBoxes();
     this.renderPlaces();
     this.renderBookmarks();
     this.renderDrives();
-    this.selectShortcut();
+    this.updateSelection();
 
     return this._sidebar;
   }
 
   private static makeBoxes(): void {
-    this._placesBox = SidebarSection.make(this._renderer);
-    this._bookmarksBox = SidebarSection.make(this._renderer);
-
-    this._bookmarksBox.marginTop = 1;
-
-    this._drivesBox = SidebarSection.make(this._renderer);
-
-    this._drivesBox.marginTop = 1;
+    this._placesBox = SidebarSection.make(this._renderer, "Places");
+    this._bookmarksBox = SidebarSection.make(this._renderer, "Bookmarks");
+    this._drivesBox = SidebarSection.make(this._renderer, "Drives");
 
     this._sidebar.add(this._placesBox);
     this._sidebar.add(this._bookmarksBox);
@@ -70,17 +61,20 @@ export class Sidebar {
     return shortcutBox;
   }
 
-  private static selectShortcut(): void {
+  public static updateSelection(): void {
+    this._entries.forEach((entry) => {
+      const isSelected: boolean = entry.shortcut.path === Store.currentPath;
+
+      entry.box.backgroundColor = isSelected
+        ? config.colors.selected_background
+        : undefined;
+    });
+
     const selected: ShortcutType | null =
       this._entries.find((entry) => entry.shortcut.path === Store.currentPath)
         ?.shortcut ?? null;
 
     Store.setSelectedShortcut(selected);
-
-    this._entries.forEach((entry) => {
-      entry.box.border =
-        entry.shortcut.path === Store.currentPath ? ["left"] : false;
-    });
   }
 
   private static renderPlaces(): void {
@@ -90,7 +84,7 @@ export class Sidebar {
       placeBox.add(
         new TextRenderable(this._renderer, {
           content: `${place.icon} ${place.label}`,
-          fg: config.colors.purple,
+          fg: config.colors.foreground,
         }),
       );
 
@@ -105,7 +99,7 @@ export class Sidebar {
       bookmarkBox.add(
         new TextRenderable(this._renderer, {
           content: `${bookmark.icon} ${bookmark.label}`,
-          fg: config.colors.purple,
+          fg: config.colors.foreground,
         }),
       );
 
@@ -120,7 +114,7 @@ export class Sidebar {
       driveBox.add(
         new TextRenderable(this._renderer, {
           content: `${drive.icon} ${drive.label}`,
-          fg: config.colors.purple,
+          fg: config.colors.foreground,
         }),
       );
 

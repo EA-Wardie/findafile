@@ -11,7 +11,7 @@ export class Content {
       border: true,
       borderColor: config.colors.border,
       title: "Explorer",
-      titleColor: config.colors.accent,
+      titleColor: config.colors.foreground,
       flexDirection: "column",
     });
 

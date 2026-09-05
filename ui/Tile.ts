@@ -1,7 +1,7 @@
 import { BoxRenderable, CliRenderer } from "@opentui/core";
 import config from "../config.toml";
 
-export class DownTile {
+export class Tile {
   private static _tile: BoxRenderable;
 
   public static make(renderer: CliRenderer): BoxRenderable {

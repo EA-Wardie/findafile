@@ -7,7 +7,7 @@ export class Shortcut {
     this._shortcut = new BoxRenderable(renderer, {
       width: "100%",
       height: 1,
-      paddingLeft: 1,
+      // paddingLeft: 1,
     });
 
     return this._shortcut;

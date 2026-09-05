@@ -14,10 +14,10 @@ import type {
   TileEntryType,
 } from "../types";
 import { Store } from "../lib/Store";
+import { Input } from "../lib/Input";
 import { readdirSync, type Dirent } from "node:fs";
-import { UpTile } from "./UpTile";
 import { Navigator } from "../lib/Navigator";
-import { DownTile } from "./DownTile";
+import { Tile } from "./Tile";
 import { ContextMenu } from "./ContextMenu";
 import { Formatter } from "../lib/Formatter";
 
@@ -127,10 +127,10 @@ export class Explorer {
 
   private static selectTile(entry: TileEntryType): void {
     if (Store.selectedTile !== null && Store.selectedTile !== entry.tile) {
-      Store.selectedTile.border = false;
+      Store.selectedTile.backgroundColor = undefined;
     }
 
-    entry.tile.border = true;
+    entry.tile.backgroundColor = config.colors.selected_background;
 
     Store.setSelectedTile(entry.tile);
   }
@@ -158,7 +158,10 @@ export class Explorer {
     const parent: string = dirname(Store.currentPath);
 
     if (parent !== Store.currentPath) {
-      this._explorer.add(this.makeUpTile(parent));
+      const upTile = this.makeTile("..", true, parent);
+
+      this._tiles.push({ tile: upTile, fullPath: parent, isDir: true });
+      this._explorer.add(upTile);
     }
 
     if (entries.length === 0) {
@@ -203,49 +206,20 @@ export class Explorer {
     }
   }
 
-  private static makeUpTile(parent: string) {
-    const tile = UpTile.make(this._renderer);
-
-    tile.add(
-      new TextRenderable(this._renderer, {
-        content: "📁",
-        fg: config.colors.border_muted,
-      }),
-    );
-
-    tile.add(
-      new TextRenderable(this._renderer, {
-        content: "..",
-        fg: config.colors.border_muted,
-      }),
-    );
-
-    tile.onMouseDown = (): void => {
-      Navigator.go(parent);
-    };
-
-    return tile;
-  }
-
   private static makeTile(label: string, isDir: boolean, fullPath: string) {
-    const tile = DownTile.make(this._renderer);
-
-    tile.borderColor = config.colors.selected;
-    tile.border = false;
+    const tile = Tile.make(this._renderer);
 
     tile.add(
       new TextRenderable(this._renderer, {
         content: isDir ? "📁" : "📄",
-        fg: isDir ? config.colors.accent : config.colors.foreground,
+        fg: config.colors.foreground,
       }),
     );
 
     tile.add(
       new TextRenderable(this._renderer, {
         content: Formatter.truncate(label, config.explorer.tile_width - 2),
-        // maxWidth: config.explorer.tile_width - 2,
-        // content: label,
-        fg: isDir ? config.colors.accent : config.colors.foreground,
+        fg: config.colors.foreground,
       }),
     );
 
@@ -281,22 +255,14 @@ export class Explorer {
         return;
       }
 
-      const now: number = Date.now();
-
-      const isDoubleClick: boolean =
-        isDir &&
-        Store.lastClick !== null &&
-        Store.lastClick.path === fullPath &&
-        now - Store.lastClick.time < config.explorer.double_click_delay;
-
-      if (isDoubleClick) {
+      if (isDir && Input.isDoubleClick(fullPath)) {
         Navigator.go(fullPath);
 
         return;
       }
 
       this.selectTile({ tile, fullPath, isDir });
-      Store.setLastClick({ path: fullPath, time: now });
+      Store.setLastClick({ path: fullPath, time: Date.now() });
     };
 
     return tile;
