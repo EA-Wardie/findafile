@@ -38,9 +38,9 @@ export class ContextMenu {
       ContextMenu.hide();
     }
 
-    for (const child of [...this._menu.getChildren()]) {
+    this._menu.getChildren().forEach((child) => {
       this._menu.remove(child);
-    }
+    });
 
     items.forEach((item, index) => {
       const row: BoxRenderable = new BoxRenderable(this._renderer, {
@@ -56,7 +56,6 @@ export class ContextMenu {
         new TextRenderable(this._renderer, {
           content: item.label,
           fg: config.colors.foreground,
-          // marginX: 1,
         }),
       );
 
@@ -65,10 +64,8 @@ export class ContextMenu {
 
     this._menu.left = x;
     this._menu.top = y;
-
     this._renderer.root.add(this._overlay);
     this._renderer.root.add(this._menu);
-
     this._open = true;
   }
 
@@ -79,7 +76,6 @@ export class ContextMenu {
 
     this._renderer.root.remove(this._overlay);
     this._renderer.root.remove(this._menu);
-
     this._open = false;
   }
 }

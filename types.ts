@@ -1,7 +1,14 @@
+import type { BoxRenderable } from "@opentui/core";
+
 export interface ShortcutType {
   label: string;
   path: string;
   icon: string;
+}
+
+export interface ShortcutEntryType {
+  shortcut: ShortcutType;
+  box: BoxRenderable;
 }
 
 export interface EntryType {

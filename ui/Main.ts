@@ -1,4 +1,4 @@
-import { BoxRenderable, CliRenderer, Renderable } from "@opentui/core";
+import { BoxRenderable, CliRenderer } from "@opentui/core";
 
 export class Main {
   private static _main: BoxRenderable;
@@ -12,9 +12,5 @@ export class Main {
     });
 
     return this._main;
-  }
-
-  public static addChild(child: Renderable): void {
-    this._main.add(child);
   }
 }
