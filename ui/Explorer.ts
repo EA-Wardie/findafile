@@ -198,7 +198,7 @@ export class Explorer extends ScrollBoxRenderable {
   }
 
   private makeTile(label: string, isDir: boolean, fullPath: string) {
-    const tile = new Tile(this.ctx, { label, isDir });
+    const tile = new Tile(this.ctx, { label, isDir, fullPath });
 
     tile.onMouseDown = (event: MouseEvent): void => {
       if (event.button === 2) {

@@ -9,11 +9,18 @@ export class Store {
   public static currentPath: string = homedir();
   public static error: string = "";
 
+  private static selectedTileListeners: ((
+    tile: BoxRenderable | null,
+  ) => void)[] = [];
+
   private static currentPathListeners: ((path: string) => void)[] = [];
+
   private static currentErrorListeners: ((error: string) => void)[] = [];
 
   public static setSelectedTile(tile: BoxRenderable | null) {
     this.selectedTile = tile;
+
+    this.selectedTileListeners.forEach((listener) => listener(tile));
   }
 
   public static setSelectedShortcut(shortcut: ShortcutType | null) {
@@ -34,6 +41,12 @@ export class Store {
     this.error = error;
 
     this.currentErrorListeners.forEach((listener) => listener(error));
+  }
+
+  public static onSelectedTileChange(
+    listener: (tile: BoxRenderable | null) => void,
+  ): void {
+    this.selectedTileListeners.push(listener);
   }
 
   public static onCurrentPathChange(listener: (path: string) => void): void {

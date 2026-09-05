@@ -5,6 +5,7 @@ import { Footer } from "./ui/Footer.ts";
 import { Sidebar } from "./ui/Sidebar.ts";
 import { Content } from "./ui/Content.ts";
 import { Explorer } from "./ui/Explorer.ts";
+import { Details } from "./ui/Details.ts";
 
 const renderer = await createCliRenderer();
 const header = new Header(renderer);
@@ -12,10 +13,12 @@ const main = new Main(renderer);
 const sidebar = new Sidebar(renderer);
 const content = new Content(renderer);
 const explorer = new Explorer(renderer);
+const details = new Details(renderer);
 const footer = new Footer(renderer);
 
 main.add(sidebar);
 main.add(content);
+main.add(details);
 
 content.add(explorer);
 

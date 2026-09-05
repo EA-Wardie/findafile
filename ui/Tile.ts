@@ -10,6 +10,7 @@ import { Formatter } from "../lib/Formatter";
 export interface Options extends BoxOptions {
   label: string;
   isDir: boolean;
+  fullPath?: string;
 }
 
 export class Tile extends BoxRenderable {
@@ -18,6 +19,10 @@ export class Tile extends BoxRenderable {
     options: Options = { label: "", isDir: false },
   ) {
     super(ctx, options);
+
+    if (options.fullPath) {
+      this.id = options.fullPath;
+    }
 
     this.width = config.explorer.tile_width;
     this.height = config.explorer.tile_height;
@@ -49,41 +54,3 @@ export class Tile extends BoxRenderable {
     );
   }
 }
-
-// export class Tile {
-//   public static make(
-//     renderer: CliRenderer,
-//     label: string,
-//     isDir: boolean,
-//   ): BoxRenderable {
-//     const tile = new BoxRenderable(renderer, {
-//       width: config.explorer.tile_width,
-//       height: config.explorer.tile_height,
-//       border: true,
-//       borderStyle: config.border_style,
-//       borderColor: config.theme.border,
-//       flexDirection: "column",
-//       alignItems: "center",
-//       justifyContent: "center",
-//       gap: 1,
-//     });
-
-//     tile.add(
-//       new TextRenderable(renderer, {
-//         content: isDir ? "📁" : "📄",
-//         fg: config.theme.foreground,
-//         selectable: false,
-//       }),
-//     );
-
-//     tile.add(
-//       new TextRenderable(renderer, {
-//         content: Formatter.truncate(label, config.explorer.tile_width - 2),
-//         fg: config.theme.foreground,
-//         selectable: false,
-//       }),
-//     );
-
-//     return tile;
-//   }
-// }
