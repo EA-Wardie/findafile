@@ -7,8 +7,10 @@ export class Store {
   public static selectedShortcut: ShortcutType | null = null;
   public static lastClick: LastClickType | null = null;
   public static currentPath: string = homedir();
+  public static error: string = "";
 
   private static currentPathListeners: ((path: string) => void)[] = [];
+  private static currentErrorListeners: ((error: string) => void)[] = [];
 
   public static setSelectedTile(tile: BoxRenderable | null) {
     this.selectedTile = tile;
@@ -28,7 +30,17 @@ export class Store {
     this.currentPathListeners.forEach((listener) => listener(path));
   }
 
+  public static setError(error: string) {
+    this.error = error;
+
+    this.currentErrorListeners.forEach((listener) => listener(error));
+  }
+
   public static onCurrentPathChange(listener: (path: string) => void): void {
     this.currentPathListeners.push(listener);
+  }
+
+  public static onErrorChange(listener: (error: string) => void): void {
+    this.currentErrorListeners.push(listener);
   }
 }

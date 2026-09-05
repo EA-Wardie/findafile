@@ -4,7 +4,8 @@ import {
   CliRenderer,
   MouseEvent,
   ScrollBoxRenderable,
-  TextRenderable,
+  type BoxOptions,
+  type RenderContext,
 } from "@opentui/core";
 import type {
   ArrowDirectionType,
@@ -19,51 +20,53 @@ import { readdirSync, type Dirent } from "node:fs";
 import { Navigator } from "../lib/Navigator";
 import { Tile } from "./Tile";
 
-export class Explorer {
-  private static _renderer: CliRenderer;
-  private static _explorer: ScrollBoxRenderable;
-  private static _tiles: TileEntryType[] = [];
+export class Explorer extends ScrollBoxRenderable {
+  private tiles: TileEntryType[] = [];
 
-  public static make(renderer: CliRenderer): ScrollBoxRenderable {
-    this._renderer = renderer;
+  constructor(ctx: RenderContext, options: BoxOptions = {}) {
+    super(ctx, options);
 
-    this._explorer = new ScrollBoxRenderable(renderer, {
-      width: "100%",
-      height: "100%",
-      contentOptions: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-      },
+    this.width = "100%";
+    this.height = "100%";
+    this.paddingX = 1;
+    this.contentOptions = {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      columnGap: 1
+    };
+
+    this.refresh();
+
+    Store.onCurrentPathChange(() => {
+      this.refresh();
     });
-
-    return this._explorer;
   }
 
-  public static move(direction: ArrowDirectionType): void {
-    if (this._tiles.length === 0) {
+  public move(direction: ArrowDirectionType): void {
+    if (this.tiles.length === 0) {
       return;
     }
 
-    const currentIndex: number = this._tiles.findIndex(
+    const currentIndex: number = this.tiles.findIndex(
       (entry) => entry.tile === Store.selectedTile,
     );
 
     if (currentIndex === -1) {
-      this.selectTile(this._tiles[0]!);
+      this.selectTile(this.tiles[0]!);
 
       return;
     }
 
-    const current: TileEntryType = this._tiles[currentIndex]!;
+    const current: TileEntryType = this.tiles[currentIndex]!;
 
     let target: TileEntryType | null = null;
 
     if (direction === "left") {
-      target = currentIndex > 0 ? this._tiles[currentIndex - 1]! : null;
+      target = currentIndex > 0 ? this.tiles[currentIndex - 1]! : null;
     } else if (direction === "right") {
       target =
-        currentIndex < this._tiles.length - 1
-          ? this._tiles[currentIndex + 1]!
+        currentIndex < this.tiles.length - 1
+          ? this.tiles[currentIndex + 1]!
           : null;
     } else {
       target = this.findVerticalNeighbor(current, direction);
@@ -74,8 +77,8 @@ export class Explorer {
     }
   }
 
-  public static openSelected(): void {
-    const selected: TileEntryType | undefined = this._tiles.find(
+  public openSelected(): void {
+    const selected: TileEntryType | undefined = this.tiles.find(
       (entry) => entry.tile === Store.selectedTile,
     );
 
@@ -84,7 +87,7 @@ export class Explorer {
     }
   }
 
-  public static navigateUp(): void {
+  public navigateUp(): void {
     const parent: string = dirname(Store.currentPath);
 
     if (parent !== Store.currentPath) {
@@ -92,11 +95,11 @@ export class Explorer {
     }
   }
 
-  private static findVerticalNeighbor(
+  private findVerticalNeighbor(
     current: TileEntryType,
     direction: "up" | "down",
   ): TileEntryType | null {
-    const candidates: TileEntryType[] = this._tiles.filter((entry) =>
+    const candidates: TileEntryType[] = this.tiles.filter((entry) =>
       direction === "up"
         ? entry.tile.y < current.tile.y
         : entry.tile.y > current.tile.y,
@@ -123,7 +126,7 @@ export class Explorer {
     );
   }
 
-  private static selectTile(entry: TileEntryType): void {
+  private selectTile(entry: TileEntryType): void {
     if (Store.selectedTile !== null && Store.selectedTile !== entry.tile) {
       Store.selectedTile.backgroundColor = undefined;
     }
@@ -133,11 +136,11 @@ export class Explorer {
     Store.setSelectedTile(entry.tile);
   }
 
-  public static render(): void {
-    this._tiles = [];
+  public refresh(): void {
+    this.tiles = [];
 
-    this._explorer.getChildren().forEach((child) => {
-      this._explorer.remove(child);
+    this.getChildren().forEach((child) => {
+      this.remove(child);
     });
 
     const { entries, error }: ReadEntriesResultType = this.readEntries(
@@ -145,13 +148,7 @@ export class Explorer {
     );
 
     if (error !== undefined) {
-      this._explorer.add(
-        new TextRenderable(this._renderer, {
-          content: `Error: ${error}`,
-          fg: "#D10000",
-          selectable: false,
-        }),
-      );
+      Store.setError(`Error: ${error}`);
     }
 
     const parent: string = dirname(Store.currentPath);
@@ -159,18 +156,12 @@ export class Explorer {
     if (parent !== Store.currentPath) {
       const upTile = this.makeTile("Back", true, parent);
 
-      this._tiles.push({ tile: upTile, fullPath: parent, isDir: true });
-      this._explorer.add(upTile);
+      this.tiles.push({ tile: upTile, fullPath: parent, isDir: true });
+      this.add(upTile);
     }
 
-    if (entries.length === 0) {
-      this._explorer.add(
-        new TextRenderable(this._renderer, {
-          content: "(empty)",
-          fg: config.theme.border_muted,
-          selectable: false,
-        }),
-      );
+    if (!entries.length) {
+      this.add(new Tile(this.ctx, { label: "(empty)", isDir: false }));
     }
 
     entries.forEach((entry) => {
@@ -178,12 +169,12 @@ export class Explorer {
 
       const tile = this.makeTile(entry.name, entry.isDir, fullPath);
 
-      this._tiles.push({ tile, fullPath, isDir: entry.isDir });
-      this._explorer.add(tile);
+      this.tiles.push({ tile, fullPath, isDir: entry.isDir });
+      this.add(tile);
     });
   }
 
-  private static readEntries(path: string): ReadEntriesResultType {
+  private readEntries(path: string): ReadEntriesResultType {
     try {
       const dirents: Dirent[] = readdirSync(path, { withFileTypes: true });
 
@@ -206,12 +197,8 @@ export class Explorer {
     }
   }
 
-  private static makeTile(label: string, isDir: boolean, fullPath: string) {
-    // const tile = Tile.make(this._renderer, label, isDir);
-    const tile = new Tile(this._renderer, {
-      label,
-      isDir,
-    });
+  private makeTile(label: string, isDir: boolean, fullPath: string) {
+    const tile = new Tile(this.ctx, { label, isDir });
 
     tile.onMouseDown = (event: MouseEvent): void => {
       if (event.button === 2) {
@@ -229,7 +216,7 @@ export class Explorer {
         items.push({
           label: "Copy",
           onSelect: (): void => {
-            this._renderer.copyToClipboardOSC52(fullPath);
+            (this.ctx as CliRenderer).copyToClipboardOSC52(fullPath);
           },
         });
 
@@ -237,8 +224,6 @@ export class Explorer {
           label: "Delete",
           onSelect: (): void => {},
         });
-
-        // ContextMenu.show(items, event.x, event.y);
 
         this.selectTile({ tile, fullPath, isDir });
 

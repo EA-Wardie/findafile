@@ -13,7 +13,8 @@ export interface Options extends BoxOptions {
 }
 
 export class Header extends BoxRenderable {
-  private leftSection: TextRenderable;
+  private leftText: TextRenderable;
+  private rightText: TextRenderable;
 
   constructor(ctx: RenderContext, options: BoxOptions = {}) {
     super(ctx, options);
@@ -27,20 +28,36 @@ export class Header extends BoxRenderable {
     this.paddingLeft = 1;
     this.flexDirection = "row";
     this.alignItems = "center";
-    this.justifyContent = "flex-start";
+    this.justifyContent = "space-between";
     this.gap = 1;
 
-    this.leftSection = new TextRenderable(ctx, {
+    this.leftText = new TextRenderable(ctx, {
       fg: config.theme.foreground,
       content: Store.currentPath,
       attributes: TextAttributes.BOLD,
       selectable: false,
     });
 
-    this.add(this.leftSection);
+    this.rightText = new TextRenderable(ctx, {
+      fg: "#D10000",
+      content: undefined,
+      attributes: TextAttributes.BOLD,
+      selectable: false,
+    });
+
+    this.add(this.leftText);
+    this.add(this.rightText);
 
     Store.onCurrentPathChange((path: string) => {
-      this.leftSection.content = path;
+      this.leftText.content = path;
+    });
+
+    Store.onErrorChange((error: string) => {
+      this.rightText.content = error;
+
+      setTimeout(() => {
+        this.rightText.content = "";
+      }, 5000);
     });
   }
 }

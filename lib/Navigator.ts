@@ -1,4 +1,3 @@
-import { Explorer } from "../ui/Explorer";
 import { Store } from "./Store";
 
 export class Navigator {
@@ -6,6 +5,5 @@ export class Navigator {
     Store.setCurrentPath(path);
     Store.setSelectedTile(null);
     Store.setLastClick(null);
-    Explorer.render();
   }
 }

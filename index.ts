@@ -11,7 +11,7 @@ const header = new Header(renderer);
 const main = new Main(renderer);
 const sidebar = new Sidebar(renderer);
 const content = new Content(renderer);
-const explorer = Explorer.make(renderer);
+const explorer = new Explorer(renderer);
 const footer = new Footer(renderer);
 
 main.add(sidebar);
@@ -28,8 +28,6 @@ renderer.root.add(header);
 renderer.root.add(main);
 renderer.root.add(footer);
 
-Explorer.render();
-
 renderer.keyInput.on("keypress", (key: KeyEvent): void => {
   if (key.name === "q") {
     renderer.destroy();
@@ -43,18 +41,18 @@ renderer.keyInput.on("keypress", (key: KeyEvent): void => {
     key.name === "left" ||
     key.name === "right"
   ) {
-    Explorer.move(key.name);
+    explorer.move(key.name);
 
     return;
   }
 
   if (key.name === "return" || key.name === "enter") {
-    Explorer.openSelected();
+    explorer.openSelected();
 
     return;
   }
 
   if (key.name === "escape") {
-    Explorer.navigateUp();
+    explorer.navigateUp();
   }
 });
