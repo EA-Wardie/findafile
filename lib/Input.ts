@@ -8,7 +8,7 @@ export class Input {
     return (
       Store.lastClick !== null &&
       Store.lastClick.path === path &&
-      now - Store.lastClick.time < config.explorer.double_click_delay
+      now - Store.lastClick.time < config.double_click_delay
     );
   }
 }

@@ -19,8 +19,9 @@ export class Header {
       width: "100%",
       height: 3,
       border: true,
-      borderColor: config.colors.border,
-      titleColor: config.colors.foreground,
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
+      titleColor: config.theme.foreground,
       paddingLeft: 1,
       flexDirection: "row",
       alignItems: "center",
@@ -37,7 +38,8 @@ export class Header {
     this._headerText = new TextRenderable(this._renderer, {
       content: Store.currentPath,
       attributes: TextAttributes.BOLD,
-      fg: config.colors.foreground,
+      selectable: false,
+      fg: config.theme.foreground,
     });
 
     this._header.add(this._headerText);

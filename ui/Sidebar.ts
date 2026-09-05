@@ -66,7 +66,7 @@ export class Sidebar {
       const isSelected: boolean = entry.shortcut.path === Store.currentPath;
 
       entry.box.backgroundColor = isSelected
-        ? config.colors.selected_background
+        ? config.theme.selected_background
         : undefined;
     });
 
@@ -87,7 +87,8 @@ export class Sidebar {
       shortcutBox.add(
         new TextRenderable(this._renderer, {
           content: `${shortcut.icon} ${shortcut.label}`,
-          fg: config.colors.foreground,
+          fg: config.theme.foreground,
+          selectable: false,
         }),
       );
 

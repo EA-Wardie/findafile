@@ -6,10 +6,11 @@ export class SidebarSection {
     return new BoxRenderable(renderer, {
       width: "100%",
       border: true,
-      borderColor: config.colors.border,
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
       flexDirection: "column",
       title: name,
-      titleColor: config.colors.foreground,
+      titleColor: config.theme.foreground,
       flexGrow: 1,
     });
   }

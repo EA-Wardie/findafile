@@ -1,12 +1,14 @@
-[explorer]
-tile_width = 17
-tile_height = 4
+border_style = "single"
 double_click_delay = 400
 
-[colors]
+[explorer]
+tile_width = 17
+tile_height = 5
+
+
+[theme]
 background = "#1a1b26"
 foreground = "#c0caf5"
-error = "#f7768e"
 selected_background = "#ffffff66"
 selected_foreground = "#c0caf5"
 border = "#414868"
@@ -15,7 +17,7 @@ border_muted = "#565f89"
 [[places]]
 path = "/home/edward"
 label = "edward"
-icon = "🏚️"
+icon = "🏠"
 
 [[places]]
 path = "/home/edward/Desktop"

@@ -7,9 +7,10 @@ export class Content {
       flexGrow: 1,
       height: "100%",
       border: true,
-      borderColor: config.colors.border,
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
       title: "Explorer",
-      titleColor: config.colors.foreground,
+      titleColor: config.theme.foreground,
       flexDirection: "column",
     });
   }

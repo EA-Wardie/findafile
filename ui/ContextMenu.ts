@@ -25,8 +25,9 @@ export class ContextMenu {
       position: "absolute",
       width: 20,
       border: true,
-      borderColor: config.colors.border,
-      backgroundColor: config.colors.background,
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
+      backgroundColor: config.theme.background,
       flexDirection: "column",
       paddingX: 1,
       zIndex: 101,
@@ -55,7 +56,8 @@ export class ContextMenu {
       row.add(
         new TextRenderable(this._renderer, {
           content: item.label,
-          fg: config.colors.foreground,
+          fg: config.theme.foreground,
+          selectable: false,
         }),
       );
 

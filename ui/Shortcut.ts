@@ -5,6 +5,7 @@ export class Shortcut {
     return new BoxRenderable(renderer, {
       width: "100%",
       height: 1,
+      paddingX: 1,
     });
   }
 }

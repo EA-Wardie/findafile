@@ -9,8 +9,8 @@ export class Footer {
       width: "100%",
       height: 3,
       border: true,
-      borderStyle: "single",
-      borderColor: config.colors.border,
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
       paddingLeft: 1,
       alignItems: "center",
     });
@@ -23,9 +23,10 @@ export class Footer {
   private static makeText(renderer: CliRenderer): void {
     this._footer.add(
       new TextRenderable(renderer, {
+        selectable: false,
         content:
-          "Mouse All | ↑ ↓ ← → Navigate | Enter Open | Escape Up | q Quit",
-        fg: config.colors.border_muted,
+          "mouse all | ↑ ↓ ← → select | return down | esc up | q quit",
+        fg: config.theme.border_muted,
       }),
     );
   }

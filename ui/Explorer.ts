@@ -19,7 +19,6 @@ import { readdirSync, type Dirent } from "node:fs";
 import { Navigator } from "../lib/Navigator";
 import { Tile } from "./Tile";
 import { ContextMenu } from "./ContextMenu";
-import { Formatter } from "../lib/Formatter";
 
 export class Explorer {
   private static _renderer: CliRenderer;
@@ -130,7 +129,7 @@ export class Explorer {
       Store.selectedTile.backgroundColor = undefined;
     }
 
-    entry.tile.backgroundColor = config.colors.selected_background;
+    entry.tile.backgroundColor = config.theme.selected_background;
 
     Store.setSelectedTile(entry.tile);
   }
@@ -150,7 +149,8 @@ export class Explorer {
       this._explorer.add(
         new TextRenderable(this._renderer, {
           content: `Error: ${error}`,
-          fg: config.colors.error,
+          fg: "#D10000",
+          selectable: false,
         }),
       );
     }
@@ -158,7 +158,7 @@ export class Explorer {
     const parent: string = dirname(Store.currentPath);
 
     if (parent !== Store.currentPath) {
-      const upTile = this.makeTile("..", true, parent);
+      const upTile = this.makeTile("Back", true, parent);
 
       this._tiles.push({ tile: upTile, fullPath: parent, isDir: true });
       this._explorer.add(upTile);
@@ -168,7 +168,8 @@ export class Explorer {
       this._explorer.add(
         new TextRenderable(this._renderer, {
           content: "(empty)",
-          fg: config.colors.border_muted,
+          fg: config.theme.border_muted,
+          selectable: false,
         }),
       );
     }
@@ -207,21 +208,7 @@ export class Explorer {
   }
 
   private static makeTile(label: string, isDir: boolean, fullPath: string) {
-    const tile = Tile.make(this._renderer);
-
-    tile.add(
-      new TextRenderable(this._renderer, {
-        content: isDir ? "📁" : "📄",
-        fg: config.colors.foreground,
-      }),
-    );
-
-    tile.add(
-      new TextRenderable(this._renderer, {
-        content: Formatter.truncate(label, config.explorer.tile_width - 2),
-        fg: config.colors.foreground,
-      }),
-    );
+    const tile = Tile.make(this._renderer, label, isDir);
 
     tile.onMouseDown = (event: MouseEvent): void => {
       if (event.button === 2) {
