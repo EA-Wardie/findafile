@@ -30,3 +30,11 @@ export interface ContextMenuItemType {
   label: string;
   onSelect: () => void;
 }
+
+export type ArrowDirectionType = "up" | "down" | "left" | "right";
+
+export interface TileEntryType {
+  tile: BoxRenderable;
+  fullPath: string;
+  isDir: boolean;
+}

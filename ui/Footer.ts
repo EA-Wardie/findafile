@@ -1,4 +1,4 @@
-import { BoxRenderable, CliRenderer } from "@opentui/core";
+import { BoxRenderable, CliRenderer, TextRenderable } from "@opentui/core";
 import config from "../config.toml";
 
 export class Footer {
@@ -15,6 +15,18 @@ export class Footer {
       alignItems: "center",
     });
 
+    this.makeText(renderer);
+
     return this._footer;
+  }
+
+  private static makeText(renderer: CliRenderer): void {
+    this._footer.add(
+      new TextRenderable(renderer, {
+        content:
+          "Mouse All | ↑ ↓ ← → Navigate | Enter Open | Escape Up | q Quit",
+        fg: config.colors.border_muted,
+      }),
+    );
   }
 }

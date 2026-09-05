@@ -23,9 +23,12 @@ ContextMenu.make(renderer);
 root.add(header);
 root.add(main);
 root.add(footer);
+
 main.add(sidebar);
 main.add(content);
+
 content.add(explorer);
+
 renderer.root.add(root);
 
 Explorer.render();
@@ -33,5 +36,28 @@ Explorer.render();
 renderer.keyInput.on("keypress", (key: KeyEvent): void => {
   if (key.name === "q") {
     renderer.destroy();
+
+    return;
+  }
+
+  if (
+    key.name === "up" ||
+    key.name === "down" ||
+    key.name === "left" ||
+    key.name === "right"
+  ) {
+    Explorer.move(key.name);
+
+    return;
+  }
+
+  if (key.name === "return" || key.name === "enter") {
+    Explorer.openSelected();
+
+    return;
+  }
+
+  if (key.name === "escape") {
+    Explorer.navigateUp();
   }
 });
