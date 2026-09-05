@@ -12,6 +12,7 @@ export class Tile {
       width: config.explorer.tile_width,
       height: config.explorer.tile_height,
       border: true,
+      borderStyle: config.border_style,
       borderColor: config.theme.border,
       flexDirection: "column",
       alignItems: "center",
