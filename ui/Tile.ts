@@ -6,6 +6,7 @@ import {
   type RenderContext,
 } from "@opentui/core";
 import { Formatter } from "../lib/Formatter";
+import { Store } from "../lib/Store";
 
 export interface Options extends BoxOptions {
   label: string;
@@ -38,6 +39,16 @@ export class Tile extends BoxRenderable {
     this.alignItems = "center";
     this.justifyContent = "center";
     this.gap = 1;
+
+    this.onMouseOver = (): void => {
+      this.backgroundColor = config.theme.selected_background;
+    };
+
+    this.onMouseOut = (): void => {
+      if (Store.selectedTile !== this) {
+        this.backgroundColor = undefined;
+      }
+    };
 
     this.add(
       new TextRenderable(ctx, {
