@@ -9,6 +9,7 @@ import { Formatter } from "../lib/Formatter";
 
 export interface Options extends BoxOptions {
   label: string;
+  icon: string;
   isDir: boolean;
   fullPath?: string;
 }
@@ -16,7 +17,11 @@ export interface Options extends BoxOptions {
 export class Tile extends BoxRenderable {
   constructor(
     ctx: RenderContext,
-    options: Options = { label: "", isDir: false },
+    options: Options = {
+      label: "",
+      icon: "📁",
+      isDir: false,
+    },
   ) {
     super(ctx, options);
 
@@ -36,7 +41,7 @@ export class Tile extends BoxRenderable {
 
     this.add(
       new TextRenderable(ctx, {
-        content: options.isDir ? "📁" : "📄",
+        content: options.icon,
         fg: config.theme.foreground,
         selectable: false,
       }),

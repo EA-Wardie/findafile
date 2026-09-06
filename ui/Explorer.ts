@@ -1,5 +1,5 @@
 import config from "../config.toml";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import {
   CliRenderer,
   MouseEvent,
@@ -20,6 +20,8 @@ import { readdirSync, type Dirent } from "node:fs";
 import { Navigator } from "../lib/Navigator";
 import { Tile } from "./Tile";
 import { ContextMenu } from "./ContextMenu";
+import { ConfirmDialog } from "./ConfirmDialog";
+import { Delete } from "../lib/Delete";
 
 export class Explorer extends ScrollBoxRenderable {
   private tiles: TileEntryType[] = [];
@@ -155,20 +157,23 @@ export class Explorer extends ScrollBoxRenderable {
     const parent: string = dirname(Store.currentPath);
 
     if (parent !== Store.currentPath) {
-      const upTile = this.makeTile("Back", true, parent);
+      const upTile = this.makeTile("Back", "↩️", true, parent);
 
       this.tiles.push({ tile: upTile, fullPath: parent, isDir: true });
       this.add(upTile);
     }
 
     if (!entries.length) {
-      this.add(new Tile(this.ctx, { label: "(empty)", isDir: false }));
+      this.add(
+        new Tile(this.ctx, { label: "(empty)", icon: "❔", isDir: false }),
+      );
     }
 
     entries.forEach((entry) => {
       const fullPath: string = join(Store.currentPath, entry.name);
+      const icon = entry.isDir ? "📁" : "📄";
 
-      const tile = this.makeTile(entry.name, entry.isDir, fullPath);
+      const tile = this.makeTile(entry.name, icon, entry.isDir, fullPath);
 
       this.tiles.push({ tile, fullPath, isDir: entry.isDir });
       this.add(tile);
@@ -198,8 +203,18 @@ export class Explorer extends ScrollBoxRenderable {
     }
   }
 
-  private makeTile(label: string, isDir: boolean, fullPath: string) {
-    const tile = new Tile(this.ctx, { label, isDir, fullPath });
+  private makeTile(
+    label: string,
+    icon: string,
+    isDir: boolean,
+    fullPath: string,
+  ) {
+    const tile = new Tile(this.ctx, {
+      label,
+      icon,
+      isDir,
+      fullPath,
+    });
 
     tile.onMouseDown = (event: MouseEvent): void => {
       if (event.button === 2) {
@@ -228,34 +243,48 @@ export class Explorer extends ScrollBoxRenderable {
   ) {
     const items: ContextMenuItemType[] = [
       {
-        label: "Copy",
+        label: "📋 Copy",
         onSelect: (): void => {
           (this.ctx as CliRenderer).copyToClipboardOSC52(fullPath);
         },
       },
       {
-        label: "Delete",
-        onSelect: (): void => {},
+        label: "🗑️ Delete",
+        onSelect: (): void => {
+          const dialog = new ConfirmDialog(this.ctx);
+
+          Store.setCurrentConfirmDialog(dialog);
+
+          dialog.show({
+            title: "Delete",
+            description: `Move "${basename(fullPath)}" to trash?`,
+            confirmLabel: "Delete",
+            onConfirm: (): void => {
+              Delete.toTrash(fullPath);
+              this.refresh();
+            },
+          });
+        },
       },
     ];
 
     if (isDir) {
       items.unshift({
-        label: "Open",
+        label: "📂 Open",
         onSelect: (): void => {
           Navigator.go(fullPath);
         },
       });
 
       items.push({
-        label: "Details",
+        label: "❔ Details",
         onSelect: (): void => {
           Store.showDetails(this.ctx);
         },
       });
     } else {
       items.push({
-        label: "Preview",
+        label: "👁️ Preview",
         onSelect: (): void => {
           Store.showPreview(this.ctx);
         },

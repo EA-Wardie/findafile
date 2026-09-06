@@ -1,6 +1,7 @@
 import type { BoxRenderable, CliRenderer, RenderContext } from "@opentui/core";
 import type { LastClickType, ShortcutType } from "../types";
 import { homedir } from "node:os";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 export class Store {
   public static selectedTile: BoxRenderable | null = null;
@@ -10,6 +11,7 @@ export class Store {
   public static error: string = "";
   public static detailsIsActive: boolean = false;
   public static previewIsActive: boolean = false;
+  public static currentConfirmDialog: ConfirmDialog | null = null;
 
   private static selectedTileListeners: ((
     tile: BoxRenderable | null,
@@ -43,6 +45,14 @@ export class Store {
     this.error = error;
 
     this.currentErrorListeners.forEach((listener) => listener(error));
+  }
+
+  public static setCurrentConfirmDialog(dialog: ConfirmDialog) {
+    this.currentConfirmDialog = dialog;
+  }
+
+  public static clearCurrentConfirmDialog() {
+    this.currentConfirmDialog = null;
   }
 
   public static showDetails(ctx: RenderContext) {

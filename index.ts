@@ -60,12 +60,12 @@ renderer.keyInput.on("keypress", (key: KeyEvent): void => {
   }
 
   if (key.name === "escape") {
-    if (details.visible) {
+    if (Store.currentConfirmDialog) {
+      Store.currentConfirmDialog.hide();
+    } else if (details.visible) {
       Store.hideDetails(renderer);
     } else if (preview.visible) {
       Store.hidePreview(renderer);
-    } else {
-      explorer.navigateUp();
     }
   }
 });

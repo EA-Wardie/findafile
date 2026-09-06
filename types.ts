@@ -31,6 +31,15 @@ export interface ContextMenuItemType {
   onSelect: () => void;
 }
 
+export interface ConfirmDialogOptionsType {
+  title: string;
+  description: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
+}
+
 export type ArrowDirectionType = "up" | "down" | "left" | "right";
 
 export interface TileEntryType {
