@@ -28,6 +28,8 @@ export class ContextMenu extends BoxRenderable {
     this.borderColor = config.theme.border;
     this.backgroundColor = config.theme.background;
     this.flexDirection = "column";
+    this.title = "Menu";
+    this.titleColor = config.theme.foreground;
     this.zIndex = 101;
     this.items = options.items;
 
