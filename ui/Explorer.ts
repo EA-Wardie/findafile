@@ -19,6 +19,7 @@ import { Input } from "../lib/Input";
 import { readdirSync, type Dirent } from "node:fs";
 import { Navigator } from "../lib/Navigator";
 import { Tile } from "./Tile";
+import { ContextMenu } from "./ContextMenu";
 
 export class Explorer extends ScrollBoxRenderable {
   private tiles: TileEntryType[] = [];
@@ -32,7 +33,7 @@ export class Explorer extends ScrollBoxRenderable {
     this.contentOptions = {
       flexDirection: "row",
       flexWrap: "wrap",
-      columnGap: 1
+      columnGap: 1,
     };
 
     this.refresh();
@@ -202,29 +203,7 @@ export class Explorer extends ScrollBoxRenderable {
 
     tile.onMouseDown = (event: MouseEvent): void => {
       if (event.button === 2) {
-        const items: ContextMenuItemType[] = [];
-
-        if (isDir) {
-          items.push({
-            label: "Open",
-            onSelect: (): void => {
-              Navigator.go(fullPath);
-            },
-          });
-        }
-
-        items.push({
-          label: "Copy",
-          onSelect: (): void => {
-            (this.ctx as CliRenderer).copyToClipboardOSC52(fullPath);
-          },
-        });
-
-        items.push({
-          label: "Delete",
-          onSelect: (): void => {},
-        });
-
+        this.showContextMenu(event, tile, isDir, fullPath);
         this.selectTile({ tile, fullPath, isDir });
 
         return;
@@ -232,8 +211,6 @@ export class Explorer extends ScrollBoxRenderable {
 
       if (isDir && Input.isDoubleClick(fullPath)) {
         Navigator.go(fullPath);
-
-        return;
       }
 
       this.selectTile({ tile, fullPath, isDir });
@@ -241,5 +218,52 @@ export class Explorer extends ScrollBoxRenderable {
     };
 
     return tile;
+  }
+
+  private showContextMenu(
+    event: MouseEvent,
+    tile: Tile,
+    isDir: boolean,
+    fullPath: string,
+  ) {
+    const items: ContextMenuItemType[] = [
+      {
+        label: "Copy",
+        onSelect: (): void => {
+          (this.ctx as CliRenderer).copyToClipboardOSC52(fullPath);
+        },
+      },
+      {
+        label: "Delete",
+        onSelect: (): void => {},
+      },
+    ];
+
+    if (isDir) {
+      items.unshift({
+        label: "Open",
+        onSelect: (): void => {
+          Navigator.go(fullPath);
+        },
+      });
+
+      items.push({
+        label: "Details",
+        onSelect: (): void => {
+          Store.showDetails(this.ctx);
+        },
+      });
+    } else {
+      items.push({
+        label: "Preview",
+        onSelect: (): void => {
+          Store.showPreview(this.ctx);
+        },
+      });
+    }
+
+    new ContextMenu(this.ctx, { items }).show(event.x, event.y);
+
+    this.selectTile({ tile, fullPath, isDir });
   }
 }

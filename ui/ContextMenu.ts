@@ -1,83 +1,99 @@
-import { BoxRenderable, CliRenderer, TextRenderable } from "@opentui/core";
 import config from "../config.toml";
+import {
+  BoxRenderable,
+  CliRenderer,
+  Renderable,
+  TextRenderable,
+  type BoxOptions,
+  type RenderContext,
+} from "@opentui/core";
 import type { ContextMenuItemType } from "../types.ts";
 
-export class ContextMenu {
-  private static _renderer: CliRenderer;
-  private static _overlay: BoxRenderable;
-  private static _menu: BoxRenderable;
-  private static _open: boolean = false;
+export interface Options extends BoxOptions {
+  items: ContextMenuItemType[];
+}
 
-  public static make(renderer: CliRenderer): void {
-    this._renderer = renderer;
+export class ContextMenu extends BoxRenderable {
+  private overlay: BoxRenderable;
+  private items: ContextMenuItemType[] = [];
+  private open: boolean = false;
 
-    this._overlay = new BoxRenderable(renderer, {
+  constructor(ctx: RenderContext, options: Options) {
+    super(ctx, options);
+
+    this.position = "absolute";
+    this.minWidth = 20;
+    this.border = true;
+    this.borderStyle = config.border_style;
+    this.borderColor = config.theme.border;
+    this.backgroundColor = config.theme.background;
+    this.flexDirection = "column";
+    this.zIndex = 101;
+    this.items = options.items;
+
+    this.overlay = new BoxRenderable(ctx, {
       position: "absolute",
-      left: 0,
       top: 0,
-      width: "100%",
-      height: "100%",
+      right: 0,
+      bottom: 0,
+      left: 0,
       zIndex: 100,
-      // onMouseDown: (): void => ContextMenu.hide(),
-    });
-
-    this._menu = new BoxRenderable(renderer, {
-      position: "absolute",
-      width: 20,
-      border: true,
-      borderStyle: config.border_style,
-      borderColor: config.theme.border,
-      backgroundColor: config.theme.background,
-      flexDirection: "column",
-      paddingX: 1,
-      zIndex: 101,
+      onMouseDown: (): void => this.hide(),
     });
   }
 
-  public static show(items: ContextMenuItemType[], x: number, y: number): void {
-    if (this._open) {
-      // ContextMenu.hide();
+  public show(x: number, y: number): void {
+    if (this.open) {
+      this.hide();
     }
 
-    this._menu.getChildren().forEach((child) => {
-      this._menu.remove(child);
+    this.getChildren().forEach((child: Renderable) => {
+      this.remove(child);
     });
 
-    items.forEach((item, index) => {
-      const row: BoxRenderable = new BoxRenderable(this._renderer, {
+    this.items.forEach((item, index) => {
+      const row: BoxRenderable = new BoxRenderable(this.ctx, {
         width: "100%",
-        marginBottom: index < items.length - 1 ? 1 : 0,
+        paddingX: 1,
         onMouseDown: (): void => {
-          // ContextMenu.hide();
+          this.hide();
           item.onSelect();
+        },
+        onMouseOver: (): void => {
+          row.backgroundColor = config.theme.selected_background;
+        },
+        onMouseOut: (): void => {
+          row.backgroundColor = undefined;
         },
       });
 
       row.add(
-        new TextRenderable(this._renderer, {
+        new TextRenderable(this.ctx, {
           content: item.label,
           fg: config.theme.foreground,
           selectable: false,
         }),
       );
 
-      this._menu.add(row);
+      this.add(row);
     });
 
-    this._menu.left = x;
-    this._menu.top = y;
-    this._renderer.root.add(this._overlay);
-    this._renderer.root.add(this._menu);
-    this._open = true;
+    this.left = x;
+    this.top = y;
+    this.open = true;
+
+    (this.ctx as CliRenderer).root.add(this.overlay);
+    (this.ctx as CliRenderer).root.add(this);
   }
 
-  public static hide(): void {
-    if (!this._open) {
+  public hide(): void {
+    if (!this.open) {
       return;
     }
 
-    this._renderer.root.remove(this._overlay);
-    this._renderer.root.remove(this._menu);
-    this._open = false;
+    this.open = false;
+
+    (this.ctx as CliRenderer).root.remove(this.overlay);
+    (this.ctx as CliRenderer).root.remove(this);
   }
 }

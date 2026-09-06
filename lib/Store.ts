@@ -1,4 +1,4 @@
-import type { BoxRenderable } from "@opentui/core";
+import type { BoxRenderable, CliRenderer, RenderContext } from "@opentui/core";
 import type { LastClickType, ShortcutType } from "../types";
 import { homedir } from "node:os";
 
@@ -8,6 +8,8 @@ export class Store {
   public static lastClick: LastClickType | null = null;
   public static currentPath: string = homedir();
   public static error: string = "";
+  public static detailsIsActive: boolean = false;
+  public static previewIsActive: boolean = false;
 
   private static selectedTileListeners: ((
     tile: BoxRenderable | null,
@@ -41,6 +43,52 @@ export class Store {
     this.error = error;
 
     this.currentErrorListeners.forEach((listener) => listener(error));
+  }
+
+  public static showDetails(ctx: RenderContext) {
+    this.detailsIsActive = true;
+
+    const main = (ctx as CliRenderer).root.getRenderable("main");
+    const detailSidebar = main?.getRenderable("details");
+
+    if (detailSidebar) {
+      detailSidebar.visible = true;
+    }
+  }
+
+  public static hideDetails(ctx: RenderContext) {
+    this.detailsIsActive = true;
+
+    const main = (ctx as CliRenderer).root.getRenderable("main");
+    const detailSidebar = main?.getRenderable("details");
+
+    if (detailSidebar) {
+      detailSidebar.visible = false;
+    }
+  }
+
+  public static showPreview(ctx: RenderContext) {
+    this.hideDetails(ctx);
+
+    this.previewIsActive = true;
+
+    const main = (ctx as CliRenderer).root.getRenderable("main");
+    const previewSidebar = main?.getRenderable("preview");
+
+    if (previewSidebar) {
+      previewSidebar.visible = true;
+    }
+  }
+
+  public static hidePreview(ctx: RenderContext) {
+    this.previewIsActive = false;
+
+    const main = (ctx as CliRenderer).root.getRenderable("main");
+    const previewSidebar = main?.getRenderable("preview");
+
+    if (previewSidebar) {
+      previewSidebar.visible = false;
+    }
   }
 
   public static onSelectedTileChange(

@@ -1,6 +1,6 @@
 import config from "../config.toml";
 import { basename } from "node:path";
-import { readdirSync, statSync, type Stats } from "node:fs";
+import { statSync, type Stats } from "node:fs";
 import {
   BoxRenderable,
   TextRenderable,
@@ -13,6 +13,7 @@ export class Details extends BoxRenderable {
   constructor(ctx: RenderContext, options: BoxOptions = {}) {
     super(ctx, options);
 
+    this.id = "details";
     this.minWidth = 41;
     this.height = "100%";
     this.border = true;
@@ -22,6 +23,7 @@ export class Details extends BoxRenderable {
     this.titleColor = config.theme.foreground;
     this.flexDirection = "column";
     this.paddingX = 1;
+    this.visible = false;
 
     this.refresh(Store.selectedTile);
 
@@ -47,21 +49,21 @@ export class Details extends BoxRenderable {
   }
 
   private rows(tile: BoxRenderable | null): string[] {
-    const path: string = tile?.id || '';
+    const path: string = tile?.id || "";
 
     try {
       const stats: Stats = statSync(path);
-      const items: number = readdirSync(path).length;
 
       return [
         `Name: ${basename(path) || path}`,
-        `Items: ${items}`,
         `Permissions: ${(stats.mode & 0o777).toString(8)}`,
         `Owner: ${stats.uid}:${stats.gid}`,
         `Modified: ${stats.mtime.toLocaleString()}`,
         `Created: ${stats.birthtime.toLocaleString()}`,
       ];
     } catch (error) {
+      Store.hideDetails(this.ctx);
+
       return [`Error: ${(error as Error).message}`];
     }
   }

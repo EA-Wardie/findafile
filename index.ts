@@ -6,6 +6,8 @@ import { Sidebar } from "./ui/Sidebar.ts";
 import { Content } from "./ui/Content.ts";
 import { Explorer } from "./ui/Explorer.ts";
 import { Details } from "./ui/Details.ts";
+import { Preview } from "./ui/Preview.ts";
+import { Store } from "./lib/Store.ts";
 
 const renderer = await createCliRenderer();
 const header = new Header(renderer);
@@ -14,11 +16,13 @@ const sidebar = new Sidebar(renderer);
 const content = new Content(renderer);
 const explorer = new Explorer(renderer);
 const details = new Details(renderer);
+const preview = new Preview(renderer);
 const footer = new Footer(renderer);
 
 main.add(sidebar);
 main.add(content);
 main.add(details);
+main.add(preview);
 
 content.add(explorer);
 
@@ -56,6 +60,12 @@ renderer.keyInput.on("keypress", (key: KeyEvent): void => {
   }
 
   if (key.name === "escape") {
-    explorer.navigateUp();
+    if (details.visible) {
+      Store.hideDetails(renderer);
+    } else if (preview.visible) {
+      Store.hidePreview(renderer);
+    } else {
+      explorer.navigateUp();
+    }
   }
 });
