@@ -53,31 +53,41 @@ export class ContextMenu extends BoxRenderable {
       this.remove(child);
     });
 
-    this.items.forEach((item, index) => {
-      const row: BoxRenderable = new BoxRenderable(this.ctx, {
-        width: "100%",
-        paddingX: 1,
-        onMouseDown: (): void => {
-          this.hide();
-          item.onSelect();
-        },
-        onMouseOver: (): void => {
-          row.backgroundColor = config.theme.selected_background;
-        },
-        onMouseOut: (): void => {
-          row.backgroundColor = undefined;
-        },
-      });
+    this.items.forEach((item) => {
+      if (!item.separator) {
+        const row: BoxRenderable = new BoxRenderable(this.ctx, {
+          width: "100%",
+          paddingX: 1,
+          onMouseDown: (): void => {
+            this.hide();
+            item.onSelect?.();
+          },
+          onMouseOver: (): void => {
+            row.backgroundColor = config.theme.selected_background;
+          },
+          onMouseOut: (): void => {
+            row.backgroundColor = undefined;
+          },
+        });
 
-      row.add(
-        new TextRenderable(this.ctx, {
-          content: item.label,
-          fg: config.theme.foreground,
-          selectable: false,
-        }),
-      );
+        row.add(
+          new TextRenderable(this.ctx, {
+            content: item.label,
+            fg: config.theme.foreground,
+            selectable: false,
+          }),
+        );
 
-      this.add(row);
+        this.add(row);
+      } else {
+        this.add(
+          new BoxRenderable(this.ctx, {
+            width: "100%",
+            border: ["top"],
+            borderColor: config.theme.border,
+          }),
+        );
+      }
     });
 
     this.left = x;

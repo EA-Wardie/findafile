@@ -41,12 +41,12 @@ export class Tile extends BoxRenderable {
     this.gap = 1;
 
     this.onMouseOver = (): void => {
-      this.backgroundColor = config.theme.selected_background;
+      this.borderColor = config.theme.border_selected;
     };
 
     this.onMouseOut = (): void => {
       if (Store.selectedTile !== this) {
-        this.backgroundColor = undefined;
+        this.borderColor = config.theme.border;
       }
     };
 

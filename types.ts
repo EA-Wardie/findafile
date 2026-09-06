@@ -27,8 +27,9 @@ export interface LastClickType {
 }
 
 export interface ContextMenuItemType {
-  label: string;
-  onSelect: () => void;
+  label?: string;
+  separator?: boolean;
+  onSelect?: () => void;
 }
 
 export interface ConfirmDialogOptionsType {

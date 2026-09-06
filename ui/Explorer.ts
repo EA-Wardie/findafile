@@ -131,10 +131,10 @@ export class Explorer extends ScrollBoxRenderable {
 
   private selectTile(entry: TileEntryType): void {
     if (Store.selectedTile !== null && Store.selectedTile !== entry.tile) {
-      Store.selectedTile.backgroundColor = undefined;
+      Store.selectedTile.borderColor = config.theme.border;
     }
 
-    entry.tile.backgroundColor = config.theme.selected_background;
+    entry.tile.borderColor = config.theme.border_selected;
 
     Store.setSelectedTile(entry.tile);
   }
@@ -243,6 +243,13 @@ export class Explorer extends ScrollBoxRenderable {
   ) {
     const items: ContextMenuItemType[] = [
       {
+        label: "📂 Open",
+        onSelect: (): void => {
+          Navigator.go(fullPath);
+        },
+      },
+      { separator: true },
+      {
         label: "📋 Copy",
         onSelect: (): void => {
           (this.ctx as CliRenderer).copyToClipboardOSC52(fullPath);
@@ -266,16 +273,10 @@ export class Explorer extends ScrollBoxRenderable {
           });
         },
       },
+      { separator: true },
     ];
 
     if (isDir) {
-      items.unshift({
-        label: "📂 Open",
-        onSelect: (): void => {
-          Navigator.go(fullPath);
-        },
-      });
-
       items.push({
         label: "❔ Details",
         onSelect: (): void => {
