@@ -25,7 +25,6 @@ const FILETYPES: Record<string, string> = {
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 
 export class Preview extends BoxRenderable {
-  private header: BoxRenderable;
   private name: TextRenderable;
   private code: CodeRenderable;
   private lineNumbers: LineNumberRenderable;
@@ -38,10 +37,10 @@ export class Preview extends BoxRenderable {
     this.width = "50%";
     this.height = "100%";
     // this.border = true;
-    this.border = ["left"];
+    // this.border = ["left"];
     // this.borderStyle = config.border_style;
     // this.borderColor = config.theme.border;
-    this.borderColor = config.theme.border;
+    // this.borderColor = config.theme.border;
     // this.title = "Preview";
     // this.titleColor = config.theme.foreground;
     this.backgroundColor = config.theme.content;
@@ -49,10 +48,12 @@ export class Preview extends BoxRenderable {
     // this.paddingX = 1;
     this.visible = false;
 
-    this.header = new BoxRenderable(ctx, {
+    const header = new BoxRenderable(ctx, {
       height: 3,
       backgroundColor: config.theme.header,
-      justifyContent: "center",
+      paddingX: 2,
+      flexDirection: "row",
+      justifyContent: "space-between",
       alignItems: "center",
     });
 
@@ -63,7 +64,24 @@ export class Preview extends BoxRenderable {
       selectable: false,
     });
 
-    this.header.add(this.name);
+    const close = new TextRenderable(this.ctx, {
+      content: "❌",
+      height: 1,
+      fg: config.theme.foreground,
+      selectable: false,
+      onMouseOver: (): void => {
+        close.bg = config.theme.selected_background;
+      },
+      onMouseOut: (): void => {
+        close.bg = undefined;
+      },
+      onMouseDown: (): void => {
+        Store.hidePreview(this.ctx);
+      },
+    });
+
+    header.add(this.name);
+    header.add(close);
 
     this.code = new CodeRenderable(ctx, {
       content: "",
@@ -87,7 +105,7 @@ export class Preview extends BoxRenderable {
     });
 
     // this.add(this.name);
-    this.add(this.header);
+    this.add(header);
     // this.add(this.code);
     this.add(this.lineNumbers);
     this.add(this.image);
@@ -108,7 +126,7 @@ export class Preview extends BoxRenderable {
       return;
     }
 
-    this.name.content = `Name: ${basename(path)}`;
+    this.name.content = `Preview: ${basename(path)}`;
 
     if (IMAGE_EXTENSIONS.has(extname(path).toLowerCase())) {
       this.code.visible = false;

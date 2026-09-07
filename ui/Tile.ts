@@ -1,11 +1,10 @@
 import config from "../config.toml";
-import { basename, join } from "node:path";
+import { basename } from "node:path";
 import {
   BoxRenderable,
   CliRenderer,
   MouseEvent,
   TextRenderable,
-  ImageRenderable,
   type BoxOptions,
   type RenderContext,
 } from "@opentui/core";
@@ -98,7 +97,7 @@ export class Tile extends BoxRenderable {
       const fullPath: string = options.fullPath;
 
       this.onMouseDown = (event: MouseEvent): void => {
-        if (event.button === 2) {
+        if (event.button === 2 && options.label !== "Back") {
           this.showContextMenu(event, fullPath, options.onDeleted);
           options.onSelect?.();
 
@@ -162,23 +161,37 @@ export class Tile extends BoxRenderable {
         },
       },
       { separator: true },
-    ];
-
-    if (this.isDir) {
-      items.push({
+      {
         label: "❔ Details",
         onSelect: (): void => {
+          Store.hidePreview(this.ctx);
           Store.showDetails(this.ctx);
         },
-      });
-    } else {
-      items.push({
+      },
+      {
         label: "👁️ Preview",
         onSelect: (): void => {
+          Store.hideDetails(this.ctx);
           Store.showPreview(this.ctx);
         },
-      });
-    }
+      },
+    ];
+
+    // if (this.isDir) {
+    //   items.push({
+    //     label: "❔ Details",
+    //     onSelect: (): void => {
+    //       Store.showDetails(this.ctx);
+    //     },
+    //   });
+    // } else {
+    //   items.push({
+    //     label: "👁️ Preview",
+    //     onSelect: (): void => {
+    //       Store.showPreview(this.ctx);
+    //     },
+    //   });
+    // }
 
     new ContextMenu(this.ctx, { items }).show(event.x, event.y);
   }

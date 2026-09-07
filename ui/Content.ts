@@ -14,7 +14,7 @@ export class Content extends BoxRenderable {
     this.height = "100%";
     this.backgroundColor = config.theme.content;
     // this.border = true;
-    this.border = ["left"];
+    this.border = ["right", "left"];
     // this.borderStyle = config.border_style;
     // this.borderColor = config.theme.border;
     this.borderColor = config.theme.border;
@@ -22,23 +22,43 @@ export class Content extends BoxRenderable {
     // this.titleColor = config.theme.foreground;
     this.flexDirection = "column";
     // this.flexGrow = 1;
+  }
 
-    const header = new BoxRenderable(ctx, {
+  public makeHeader() {
+    const header = new BoxRenderable(this.ctx, {
       height: 3,
       backgroundColor: config.theme.header,
       justifyContent: "center",
       alignItems: "center",
     });
 
-    const headerText = new TextRenderable(ctx, {
+    const headerText = new TextRenderable(this.ctx, {
       content: Store.currentPath,
     });
 
     header.add(headerText);
-    this.add(header);
 
     Store.onCurrentPathChange((path: string) => {
       headerText.content = path;
     });
+
+    this.add(header);
+  }
+
+  public makeFooter() {
+    const footer = new BoxRenderable(this.ctx, {
+      height: 3,
+      backgroundColor: config.theme.header,
+      justifyContent: "center",
+      alignItems: "center",
+    });
+
+    const footerText = new TextRenderable(this.ctx, {
+      content: "mouse all | ↑ ↓ ← → select | return down | esc close | q quit",
+    });
+
+    footer.add(footerText);
+
+    this.add(footer);
   }
 }

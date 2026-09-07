@@ -15,13 +15,13 @@ export class Details extends BoxRenderable {
 
     this.id = "details";
     // this.minWidth = 41;
-    this.width = 35;
+    this.width = "50%";
     this.height = "100%";
     // this.border = true;
-    ((this.border = ["left"]),
-      // this.borderStyle = config.border_style;
-      // this.borderColor = config.theme.border;
-      (this.borderColor = config.theme.border));
+    // this.border = ["left"];
+    // this.borderStyle = config.border_style;
+    // this.borderColor = config.theme.border;
+    // this.borderColor = config.theme.border;
     // this.title = "Details";
     // this.titleColor = config.theme.foreground;
     this.backgroundColor = config.theme.content;
@@ -46,18 +46,38 @@ export class Details extends BoxRenderable {
     const header = new BoxRenderable(this.ctx, {
       height: 3,
       backgroundColor: config.theme.header,
-      justifyContent: "center",
+      paddingX: 2,
+      flexDirection: "row",
+      justifyContent: "space-between",
       alignItems: "center",
     });
 
     const name = new TextRenderable(this.ctx, {
-      content: basename(path) || path,
+      content: `Details ${basename(path) || path}`,
       height: 1,
       fg: config.theme.foreground,
       selectable: false,
     });
 
+    const close = new TextRenderable(this.ctx, {
+      content: "❌",
+      height: 1,
+      fg: config.theme.foreground,
+      selectable: false,
+      onMouseOver: (): void => {
+        close.bg = config.theme.selected_background;
+      },
+      onMouseOut: (): void => {
+        close.bg = undefined;
+      },
+      onMouseDown: (): void => {
+        Store.hideDetails(this.ctx);
+      },
+    });
+
     header.add(name);
+    header.add(close);
+
     this.add(header);
 
     const content = new BoxRenderable(this.ctx, {
@@ -92,11 +112,15 @@ export class Details extends BoxRenderable {
       const stats: Stats = statSync(path);
 
       return [
-        // `Name: ${basename(path) || path}`,
-        `Created: ${stats.birthtime.toLocaleString()}`,
-        `Modified: ${stats.mtime.toLocaleString()}`,
-        `Owner: ${stats.uid}:${stats.gid}`,
-        `Permissions: ${(stats.mode & 0o777).toString(8)}`,
+        `Name        | ${basename(path) || path}`,
+        `Location    | ${path}`,
+        `Kind        | ${stats.isDirectory() ? "Directory" : "File"}`,
+        `Size        | ${stats.size}`,
+        `Created     | ${stats.birthtime.toLocaleString()}`,
+        `Modified    | ${stats.mtime.toLocaleString()}`,
+        `Accessed    | ${stats.atime.toLocaleString()}`,
+        `Owner       | ${stats.uid}:${stats.gid}`,
+        `Permissions | ${(stats.mode & 0o777).toString(8)}`,
       ];
     } catch (error) {
       // Store.hideDetails(this.ctx);

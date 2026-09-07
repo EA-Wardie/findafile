@@ -17,14 +17,16 @@ const content = new Content(renderer);
 const explorer = new Explorer(renderer);
 const details = new Details(renderer);
 const preview = new Preview(renderer);
-const footer = new Footer(renderer);
+// const footer = new Footer(renderer);
 
 main.add(sidebar);
 main.add(content);
 main.add(details);
 main.add(preview);
 
+content.makeHeader();
 content.add(explorer);
+content.makeFooter();
 
 renderer.root.width = "100%";
 renderer.root.height = "100%";
@@ -33,7 +35,7 @@ renderer.root.flexDirection = "column";
 
 // renderer.root.add(header);
 renderer.root.add(main);
-renderer.root.add(footer);
+// renderer.root.add(footer);
 
 renderer.keyInput.on("keypress", (key: KeyEvent): void => {
   if (key.name === "q") {

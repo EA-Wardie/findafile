@@ -12,19 +12,19 @@ export class Footer extends BoxRenderable {
 
     this.width = "100%";
     // this.height = 3;
-    this.height = 1;
+    this.height = 3;
     this.backgroundColor = config.theme.footer;
     // this.border = true;
     // this.borderStyle = config.border_style;
     // this.borderColor = config.theme.border;
-    // this.justifyContent = "center";
+    this.justifyContent = "center";
     this.alignItems = "center";
     this.paddingLeft = 1;
 
     this.add(
       new TextRenderable(ctx, {
         selectable: false,
-        content: "mouse all | ↑ ↓ ← → select | return down | esc up | q quit",
+        content: "mouse all | ↑ ↓ ← → select | return down | esc close | q quit",
         fg: config.theme.border_muted,
       }),
     );
