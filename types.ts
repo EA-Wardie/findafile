@@ -1,4 +1,5 @@
 import type { BoxRenderable } from "@opentui/core";
+import type { Tile } from "./ui/Tile";
 
 export interface ShortcutType {
   label: string;
@@ -44,7 +45,7 @@ export interface ConfirmDialogOptionsType {
 export type ArrowDirectionType = "up" | "down" | "left" | "right";
 
 export interface TileEntryType {
-  tile: BoxRenderable;
+  tile: Tile;
   fullPath: string;
   isDir: boolean;
 }

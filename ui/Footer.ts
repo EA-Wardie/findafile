@@ -11,10 +11,13 @@ export class Footer extends BoxRenderable {
     super(ctx, options);
 
     this.width = "100%";
-    this.height = 3;
-    this.border = true;
-    this.borderStyle = config.border_style;
-    this.borderColor = config.theme.border;
+    // this.height = 3;
+    this.height = 1;
+    this.backgroundColor = config.theme.footer;
+    // this.border = true;
+    // this.borderStyle = config.border_style;
+    // this.borderColor = config.theme.border;
+    // this.justifyContent = "center";
     this.alignItems = "center";
     this.paddingLeft = 1;
 

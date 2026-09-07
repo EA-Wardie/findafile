@@ -10,7 +10,7 @@ import { Preview } from "./ui/Preview.ts";
 import { Store } from "./lib/Store.ts";
 
 const renderer = await createCliRenderer();
-const header = new Header(renderer);
+// const header = new Header(renderer);
 const main = new Main(renderer);
 const sidebar = new Sidebar(renderer);
 const content = new Content(renderer);
@@ -29,9 +29,9 @@ content.add(explorer);
 renderer.root.width = "100%";
 renderer.root.height = "100%";
 renderer.root.flexDirection = "column";
-renderer.root.paddingX = 1;
+// renderer.root.paddingX = 1;
 
-renderer.root.add(header);
+// renderer.root.add(header);
 renderer.root.add(main);
 renderer.root.add(footer);
 

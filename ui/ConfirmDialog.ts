@@ -25,12 +25,14 @@ export class ConfirmDialog extends BoxRenderable {
 
     this.id = "confirm";
     this.minWidth = 42;
-    this.border = true;
-    this.borderStyle = config.border_style;
-    this.borderColor = config.theme.border;
-    this.backgroundColor = config.theme.background;
+    // this.border = true;
+    // this.borderStyle = config.border_style;
+    // this.borderColor = config.theme.border;
+    // this.backgroundColor = config.theme.background;
+    this.backgroundColor = config.theme.sidebar;
     this.flexDirection = "column";
-    this.paddingX = 1;
+    this.paddingY = 1;
+    this.paddingX = 2;
     this.gap = 1;
     this.zIndex = 101;
 
@@ -61,7 +63,7 @@ export class ConfirmDialog extends BoxRenderable {
     const actions = new BoxRenderable(ctx, {
       flexDirection: "row",
       justifyContent: "flex-end",
-      gap: 2,
+      gap: 1,
     });
 
     this.cancelLabel = new TextRenderable(ctx, {
@@ -71,15 +73,21 @@ export class ConfirmDialog extends BoxRenderable {
     });
 
     this.cancelButton = new BoxRenderable(ctx, {
-      border: true,
-      borderStyle: config.border_style,
-      borderColor: config.theme.border,
-      paddingX: 2,
+      height: 1,
+      // border: true,
+      // borderStyle: config.border_style,
+      // borderColor: config.theme.border,
+      backgroundColor: config.theme.content,
+      // paddingX: 2,
+      alignItems: "center",
+      paddingX: 1,
+      flexGrow: 1,
       onMouseOver: (): void => {
         this.cancelButton.backgroundColor = config.theme.selected_background;
       },
       onMouseOut: (): void => {
-        this.cancelButton.backgroundColor = undefined;
+        // this.cancelButton.backgroundColor = undefined;
+        this.cancelButton.backgroundColor = config.theme.content;
       },
     });
 
@@ -90,15 +98,21 @@ export class ConfirmDialog extends BoxRenderable {
     });
 
     this.confirmButton = new BoxRenderable(ctx, {
-      border: true,
-      borderStyle: config.border_style,
-      borderColor: config.theme.border,
-      paddingX: 2,
+      height: 1,
+      // border: true,
+      // borderStyle: config.border_style,
+      // borderColor: config.theme.border,
+      backgroundColor: config.theme.content,
+      // paddingX: 2,
+      alignItems: "center",
+      paddingX: 1,
+      flexGrow: 1,
       onMouseOver: (): void => {
         this.confirmButton.backgroundColor = config.theme.selected_background;
       },
       onMouseOut: (): void => {
-        this.confirmButton.backgroundColor = undefined;
+        // this.confirmButton.backgroundColor = undefined;
+        this.confirmButton.backgroundColor = config.theme.content;
       },
     });
 

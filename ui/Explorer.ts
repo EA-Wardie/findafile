@@ -1,27 +1,15 @@
-import config from "../config.toml";
-import { basename, dirname, join } from "node:path";
-import {
-  CliRenderer,
-  MouseEvent,
-  ScrollBoxRenderable,
-  type BoxOptions,
-  type RenderContext,
-} from "@opentui/core";
+import { dirname, join } from "node:path";
+import { ScrollBoxRenderable, type BoxOptions, type RenderContext } from "@opentui/core";
 import type {
   ArrowDirectionType,
-  ContextMenuItemType,
   EntryType,
   ReadEntriesResultType,
   TileEntryType,
 } from "../types";
 import { Store } from "../lib/Store";
-import { Input } from "../lib/Input";
 import { readdirSync, type Dirent } from "node:fs";
 import { Navigator } from "../lib/Navigator";
 import { Tile } from "./Tile";
-import { ContextMenu } from "./ContextMenu";
-import { ConfirmDialog } from "./ConfirmDialog";
-import { Delete } from "../lib/Delete";
 
 export class Explorer extends ScrollBoxRenderable {
   private tiles: TileEntryType[] = [];
@@ -31,11 +19,11 @@ export class Explorer extends ScrollBoxRenderable {
 
     this.width = "100%";
     this.height = "100%";
-    this.paddingX = 1;
+    // this.paddingX = 1;
     this.contentOptions = {
       flexDirection: "row",
       flexWrap: "wrap",
-      columnGap: 1,
+      // columnGap: 1,
     };
 
     this.refresh();
@@ -131,10 +119,10 @@ export class Explorer extends ScrollBoxRenderable {
 
   private selectTile(entry: TileEntryType): void {
     if (Store.selectedTile !== null && Store.selectedTile !== entry.tile) {
-      Store.selectedTile.borderColor = config.theme.border;
+      (Store.selectedTile as Tile).setSelected(false);
     }
 
-    entry.tile.borderColor = config.theme.border_selected;
+    entry.tile.setSelected(true);
 
     Store.setSelectedTile(entry.tile);
   }
@@ -208,92 +196,23 @@ export class Explorer extends ScrollBoxRenderable {
     icon: string,
     isDir: boolean,
     fullPath: string,
-  ) {
+  ): Tile {
     const tile = new Tile(this.ctx, {
       label,
       icon,
       isDir,
       fullPath,
+      onSelect: (): void => {
+        this.selectTile({ tile, fullPath, isDir });
+      },
+      onOpen: (): void => {
+        Navigator.go(fullPath);
+      },
+      onDeleted: (): void => {
+        this.refresh();
+      },
     });
 
-    tile.onMouseDown = (event: MouseEvent): void => {
-      if (event.button === 2) {
-        this.showContextMenu(event, tile, isDir, fullPath);
-        this.selectTile({ tile, fullPath, isDir });
-
-        return;
-      }
-
-      if (isDir && Input.isDoubleClick(fullPath)) {
-        Navigator.go(fullPath);
-      }
-
-      this.selectTile({ tile, fullPath, isDir });
-      Store.setLastClick({ path: fullPath, time: Date.now() });
-    };
-
     return tile;
-  }
-
-  private showContextMenu(
-    event: MouseEvent,
-    tile: Tile,
-    isDir: boolean,
-    fullPath: string,
-  ) {
-    const items: ContextMenuItemType[] = [
-      {
-        label: "📂 Open",
-        onSelect: (): void => {
-          Navigator.go(fullPath);
-        },
-      },
-      { separator: true },
-      {
-        label: "📋 Copy",
-        onSelect: (): void => {
-          (this.ctx as CliRenderer).copyToClipboardOSC52(fullPath);
-        },
-      },
-      {
-        label: "🗑️ Delete",
-        onSelect: (): void => {
-          const dialog = new ConfirmDialog(this.ctx);
-
-          Store.setCurrentConfirmDialog(dialog);
-
-          dialog.show({
-            title: "Delete",
-            description: `Move "${basename(fullPath)}" to trash?`,
-            confirmLabel: "Delete",
-            onConfirm: (): void => {
-              Delete.toTrash(fullPath);
-              this.refresh();
-            },
-          });
-        },
-      },
-      { separator: true },
-    ];
-
-    if (isDir) {
-      items.push({
-        label: "❔ Details",
-        onSelect: (): void => {
-          Store.showDetails(this.ctx);
-        },
-      });
-    } else {
-      items.push({
-        label: "👁️ Preview",
-        onSelect: (): void => {
-          Store.showPreview(this.ctx);
-        },
-      });
-    }
-
-    new ContextMenu(this.ctx, { items }).show(event.x, event.y);
-
-    this.selectTile({ tile, fullPath, isDir });
   }
 }

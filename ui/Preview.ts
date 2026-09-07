@@ -5,6 +5,7 @@ import {
   BoxRenderable,
   CodeRenderable,
   ImageRenderable,
+  LineNumberRenderable,
   SyntaxStyle,
   TextRenderable,
   type BoxOptions,
@@ -24,24 +25,36 @@ const FILETYPES: Record<string, string> = {
 const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 
 export class Preview extends BoxRenderable {
+  private header: BoxRenderable;
   private name: TextRenderable;
   private code: CodeRenderable;
+  private lineNumbers: LineNumberRenderable;
   private image: ImageRenderable;
 
   constructor(ctx: RenderContext, options: BoxOptions = {}) {
     super(ctx, options);
 
     this.id = "preview";
-    this.minWidth = "40%";
+    this.width = "50%";
     this.height = "100%";
-    this.border = true;
-    this.borderStyle = config.border_style;
+    // this.border = true;
+    this.border = ["left"];
+    // this.borderStyle = config.border_style;
+    // this.borderColor = config.theme.border;
     this.borderColor = config.theme.border;
-    this.title = "Preview";
-    this.titleColor = config.theme.foreground;
+    // this.title = "Preview";
+    // this.titleColor = config.theme.foreground;
+    this.backgroundColor = config.theme.content;
     this.flexDirection = "column";
-    this.paddingX = 1;
+    // this.paddingX = 1;
     this.visible = false;
+
+    this.header = new BoxRenderable(ctx, {
+      height: 3,
+      backgroundColor: config.theme.header,
+      justifyContent: "center",
+      alignItems: "center",
+    });
 
     this.name = new TextRenderable(ctx, {
       content: "",
@@ -50,11 +63,21 @@ export class Preview extends BoxRenderable {
       selectable: false,
     });
 
+    this.header.add(this.name);
+
     this.code = new CodeRenderable(ctx, {
       content: "",
       syntaxStyle: SyntaxStyle.create(),
       wrapMode: "word",
       flexGrow: 1,
+    });
+
+    this.lineNumbers = new LineNumberRenderable(ctx, {
+      target: this.code,
+      // minWidth: 3,
+      // paddingRight: 1,
+      fg: "#6b7280",
+      bg: config.theme.sidebar,
     });
 
     this.image = new ImageRenderable(ctx, {
@@ -63,8 +86,10 @@ export class Preview extends BoxRenderable {
       onError: (): void => Store.hidePreview(this.ctx),
     });
 
-    this.add(this.name);
-    this.add(this.code);
+    // this.add(this.name);
+    this.add(this.header);
+    // this.add(this.code);
+    this.add(this.lineNumbers);
     this.add(this.image);
 
     this.refresh(Store.selectedTile);

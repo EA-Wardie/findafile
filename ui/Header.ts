@@ -21,19 +21,19 @@ export class Header extends BoxRenderable {
 
     this.width = "100%";
     this.height = 3;
-    this.border = true;
-    this.borderStyle = config.border_style;
-    this.borderColor = config.theme.border;
-    this.titleColor = config.theme.foreground;
-    this.paddingLeft = 1;
+    this.backgroundColor = config.theme.header;
+    // this.border = true;
+    // this.borderStyle = config.border_style;
+    // this.borderColor = config.theme.border;
+    this.paddingX = 2;
     this.flexDirection = "row";
     this.alignItems = "center";
     this.justifyContent = "space-between";
-    this.gap = 1;
+    // this.gap = 1;
 
     this.leftText = new TextRenderable(ctx, {
       fg: config.theme.foreground,
-      content: Store.currentPath,
+      content: `🔗 ${Store.currentPath}`,
       attributes: TextAttributes.BOLD,
       selectable: false,
     });
@@ -49,7 +49,7 @@ export class Header extends BoxRenderable {
     this.add(this.rightText);
 
     Store.onCurrentPathChange((path: string) => {
-      this.leftText.content = path;
+      this.leftText.content = `🔗 ${path}`;
     });
 
     Store.onErrorChange((error: string) => {

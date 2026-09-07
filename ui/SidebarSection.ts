@@ -21,12 +21,13 @@ export class SidebarSection extends BoxRenderable {
     super(ctx, options);
 
     this.width = "100%";
-    this.border = true;
-    this.borderStyle = config.border_style;
-    this.borderColor = config.theme.border;
-    this.titleColor = config.theme.foreground;
+    // this.border = true;
+    // this.borderStyle = config.border_style;
+    // this.borderColor = config.theme.border;
+    // this.titleColor = config.theme.foreground;
     this.flexDirection = "column";
-    this.flexGrow = 1;
+    // this.flexGrow = 1;
+    // this.paddingY = 1;
 
     options.shortcuts.forEach((shortcut: ShortcutType) => {
       const shortcutBox = new Shortcut(ctx, { shortcut });

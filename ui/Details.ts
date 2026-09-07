@@ -14,15 +14,19 @@ export class Details extends BoxRenderable {
     super(ctx, options);
 
     this.id = "details";
-    this.minWidth = 41;
+    // this.minWidth = 41;
+    this.width = 35;
     this.height = "100%";
-    this.border = true;
-    this.borderStyle = config.border_style;
-    this.borderColor = config.theme.border;
-    this.title = "Details";
-    this.titleColor = config.theme.foreground;
+    // this.border = true;
+    ((this.border = ["left"]),
+      // this.borderStyle = config.border_style;
+      // this.borderColor = config.theme.border;
+      (this.borderColor = config.theme.border));
+    // this.title = "Details";
+    // this.titleColor = config.theme.foreground;
+    this.backgroundColor = config.theme.content;
     this.flexDirection = "column";
-    this.paddingX = 1;
+    // this.paddingX = 1;
     this.visible = false;
 
     this.refresh(Store.selectedTile);
@@ -37,8 +41,39 @@ export class Details extends BoxRenderable {
       this.remove(child);
     });
 
+    const path: string = tile?.id || "";
+
+    const header = new BoxRenderable(this.ctx, {
+      height: 3,
+      backgroundColor: config.theme.header,
+      justifyContent: "center",
+      alignItems: "center",
+    });
+
+    const name = new TextRenderable(this.ctx, {
+      content: basename(path) || path,
+      height: 1,
+      fg: config.theme.foreground,
+      selectable: false,
+    });
+
+    header.add(name);
+    this.add(header);
+
+    const content = new BoxRenderable(this.ctx, {
+      width: "100%",
+      padding: 1,
+    });
+
     this.rows(tile).forEach((row) => {
-      this.add(
+      // this.add(
+      //   new TextRenderable(this.ctx, {
+      //     content: row,
+      //     fg: config.theme.foreground,
+      //     selectable: false,
+      //   }),
+      // );
+      content.add(
         new TextRenderable(this.ctx, {
           content: row,
           fg: config.theme.foreground,
@@ -46,6 +81,8 @@ export class Details extends BoxRenderable {
         }),
       );
     });
+
+    this.add(content);
   }
 
   private rows(tile: BoxRenderable | null): string[] {
@@ -55,14 +92,14 @@ export class Details extends BoxRenderable {
       const stats: Stats = statSync(path);
 
       return [
-        `Name: ${basename(path) || path}`,
-        `Permissions: ${(stats.mode & 0o777).toString(8)}`,
-        `Owner: ${stats.uid}:${stats.gid}`,
-        `Modified: ${stats.mtime.toLocaleString()}`,
+        // `Name: ${basename(path) || path}`,
         `Created: ${stats.birthtime.toLocaleString()}`,
+        `Modified: ${stats.mtime.toLocaleString()}`,
+        `Owner: ${stats.uid}:${stats.gid}`,
+        `Permissions: ${(stats.mode & 0o777).toString(8)}`,
       ];
     } catch (error) {
-      Store.hideDetails(this.ctx);
+      // Store.hideDetails(this.ctx);
 
       return [`Error: ${(error as Error).message}`];
     }

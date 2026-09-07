@@ -23,10 +23,11 @@ export class ContextMenu extends BoxRenderable {
 
     this.position = "absolute";
     this.minWidth = 20;
-    this.border = true;
-    this.borderStyle = config.border_style;
-    this.borderColor = config.theme.border;
-    this.backgroundColor = config.theme.background;
+    // this.border = true;
+    // this.borderStyle = config.border_style;
+    // this.borderColor = config.theme.border;
+    // this.backgroundColor = config.theme.background;
+    this.backgroundColor = config.theme.sidebar;
     this.flexDirection = "column";
     this.title = "Menu";
     this.titleColor = config.theme.foreground;
@@ -79,15 +80,16 @@ export class ContextMenu extends BoxRenderable {
         );
 
         this.add(row);
-      } else {
-        this.add(
-          new BoxRenderable(this.ctx, {
-            width: "100%",
-            border: ["top"],
-            borderColor: config.theme.border,
-          }),
-        );
       }
+      // else {
+      //   this.add(
+      //     new BoxRenderable(this.ctx, {
+      //       width: "100%",
+      //       border: ["top"],
+      //       borderColor: config.theme.border,
+      //     }),
+      //   );
+      // }
     });
 
     this.left = x;
