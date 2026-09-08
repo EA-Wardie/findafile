@@ -1,5 +1,5 @@
 import config from "../config.toml";
-import { basename } from "node:path";
+import { basename, join } from "node:path";
 import {
   BoxRenderable,
   CliRenderer,
@@ -13,9 +13,11 @@ import { Formatter } from "../lib/Formatter";
 import { Store } from "../lib/Store";
 import { Navigator } from "../lib/Navigator";
 import { Delete } from "../lib/Delete";
+import { Create } from "../lib/Create";
 import { Input } from "../lib/Input";
 import { ContextMenu } from "./ContextMenu";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { PromptDialog } from "./PromptDialog";
 
 export interface Options extends BoxOptions {
   label: string;
@@ -25,6 +27,7 @@ export interface Options extends BoxOptions {
   onSelect?: () => void;
   onOpen?: () => void;
   onDeleted?: () => void;
+  onCreated?: () => void;
 }
 
 export class Tile extends BoxRenderable {
@@ -89,9 +92,18 @@ export class Tile extends BoxRenderable {
       const fullPath: string = options.fullPath;
 
       this.onMouseDown = (event: MouseEvent): void => {
-        if (event.button === 2 && options.label !== "Back") {
-          this.showContextMenu(event, fullPath, options.onDeleted);
-          options.onSelect?.();
+        if (event.button === 2) {
+          event.stopPropagation();
+
+          if (options.label !== "Back") {
+            this.showContextMenu(
+              event,
+              fullPath,
+              options.onDeleted,
+              options.onCreated,
+            );
+            options.onSelect?.();
+          }
 
           return;
         }
@@ -126,8 +138,29 @@ export class Tile extends BoxRenderable {
     event: MouseEvent,
     fullPath: string,
     onDeleted?: () => void,
+    onCreated?: () => void,
   ): void {
     const items: ContextMenuItemType[] = [
+    { separator: true },
+      {
+        label: "📄 New File",
+        onSelect: (): void => {
+          this.promptCreate("New File", (name: string) => {
+            Create.file(join(Store.currentPath, name));
+            onCreated?.();
+          });
+        },
+      },
+      {
+        label: "📁 New Folder",
+        onSelect: (): void => {
+          this.promptCreate("New Folder", (name: string) => {
+            Create.folder(join(Store.currentPath, name));
+            onCreated?.();
+          });
+        },
+      },
+      { separator: true },
       {
         label: "📂 Open",
         onSelect: (): void => {
@@ -174,8 +207,22 @@ export class Tile extends BoxRenderable {
           Store.showPreview(this.ctx);
         },
       },
+      { separator: true },
     ];
 
     new ContextMenu(this.ctx, { items }).show(event.x, event.y);
+  }
+
+  private promptCreate(title: string, create: (name: string) => void): void {
+    const dialog = new PromptDialog(this.ctx);
+
+    Store.setCurrentPromptDialog(dialog);
+
+    dialog.show({
+      title,
+      label: "Name",
+      confirmLabel: "Create",
+      onConfirm: create,
+    });
   }
 }

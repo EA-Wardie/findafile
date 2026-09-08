@@ -42,6 +42,16 @@ export interface ConfirmDialogOptionsType {
   onCancel?: () => void;
 }
 
+export interface PromptDialogOptionsType {
+  title: string;
+  label?: string;
+  placeholder?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  onConfirm: (value: string) => void;
+  onCancel?: () => void;
+}
+
 export type ArrowDirectionType = "up" | "down" | "left" | "right";
 
 export interface TileEntryType {

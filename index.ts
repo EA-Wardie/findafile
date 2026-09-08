@@ -31,6 +31,15 @@ renderer.root.flexDirection = "column";
 renderer.root.add(main);
 
 renderer.keyInput.on("keypress", (key: KeyEvent): void => {
+  if (Store.currentConfirmDialog || Store.currentPromptDialog) {
+    if (key.name === "escape") {
+      Store.currentConfirmDialog?.hide();
+      Store.currentPromptDialog?.hide();
+    }
+
+    return;
+  }
+
   if (key.name === "q") {
     renderer.destroy();
 
@@ -55,9 +64,7 @@ renderer.keyInput.on("keypress", (key: KeyEvent): void => {
   }
 
   if (key.name === "escape") {
-    if (Store.currentConfirmDialog) {
-      Store.currentConfirmDialog.hide();
-    } else if (details.visible) {
+    if (details.visible) {
       Store.hideDetails(renderer);
     } else if (preview.visible) {
       Store.hidePreview(renderer);

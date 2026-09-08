@@ -25,8 +25,6 @@ export class ContextMenu extends BoxRenderable {
     this.minWidth = 20;
     this.backgroundColor = config.theme.sidebar;
     this.flexDirection = "column";
-    this.title = "Menu";
-    this.titleColor = config.theme.foreground;
     this.zIndex = 101;
     this.items = options.items;
 
@@ -76,6 +74,13 @@ export class ContextMenu extends BoxRenderable {
         );
 
         this.add(row);
+      } else {
+        const separator: BoxRenderable = new BoxRenderable(this.ctx, {
+          border: ["top"],
+          borderColor: config.theme.border,
+        });
+
+        this.add(separator);
       }
     });
 

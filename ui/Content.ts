@@ -49,6 +49,7 @@ export class Content extends BoxRenderable {
 
     const footerText = new TextRenderable(this.ctx, {
       content: "mouse all | ↑ ↓ ← → select | return down | esc close | q quit",
+      fg: config.theme.selected_background,
     });
 
     footer.add(footerText);

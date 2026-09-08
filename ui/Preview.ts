@@ -4,14 +4,15 @@ import { readFileSync } from "node:fs";
 import {
   BoxRenderable,
   CodeRenderable,
+  getTreeSitterClient,
   ImageRenderable,
   LineNumberRenderable,
-  SyntaxStyle,
   TextRenderable,
   type BoxOptions,
   type RenderContext,
 } from "@opentui/core";
 import { Store } from "../lib/Store";
+import { Syntax } from "../lib/Syntax";
 
 const FILETYPES: Record<string, string> = {
   ".ts": "typescript",
@@ -75,11 +76,19 @@ export class Preview extends BoxRenderable {
     header.add(this.name);
     header.add(close);
 
+    this.image = new ImageRenderable(ctx, {
+      fit: "fit",
+      flexGrow: 1,
+      onError: (): void => Store.hidePreview(this.ctx),
+    });
+
+    this.add(header);
+
     this.code = new CodeRenderable(ctx, {
       content: "",
-      syntaxStyle: SyntaxStyle.create(),
       wrapMode: "word",
       flexGrow: 1,
+      syntaxStyle: Syntax.getStyles(),
     });
 
     this.lineNumbers = new LineNumberRenderable(ctx, {
@@ -88,16 +97,8 @@ export class Preview extends BoxRenderable {
       bg: config.theme.sidebar,
     });
 
-    this.image = new ImageRenderable(ctx, {
-      fit: "fit",
-      flexGrow: 1,
-      onError: (): void => Store.hidePreview(this.ctx),
-    });
-
-    this.add(header);
-    this.add(this.lineNumbers);
     this.add(this.image);
-
+    this.add(this.lineNumbers);
     this.refresh(Store.selectedTile);
 
     Store.onSelectedTileChange((tile: BoxRenderable | null) => {
@@ -130,8 +131,15 @@ export class Preview extends BoxRenderable {
     this.code.visible = true;
 
     try {
-      this.code.content = readFileSync(path, "utf-8");
-      this.code.filetype = FILETYPES[extname(path)];
+      const tsClient = getTreeSitterClient();
+      const contents = readFileSync(path, "utf-8");
+      const fileType = FILETYPES[extname(path)];
+
+      tsClient.initialize().then(() => {
+        this.code.content = contents;
+        this.code.filetype = fileType;
+        this.code.treeSitterClient = tsClient;
+      });
     } catch (error) {
       Store.hidePreview(this.ctx);
     }

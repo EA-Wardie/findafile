@@ -1,7 +1,13 @@
 import { dirname, join } from "node:path";
-import { ScrollBoxRenderable, type BoxOptions, type RenderContext } from "@opentui/core";
+import {
+  ScrollBoxRenderable,
+  type BoxOptions,
+  type MouseEvent,
+  type RenderContext,
+} from "@opentui/core";
 import type {
   ArrowDirectionType,
+  ContextMenuItemType,
   EntryType,
   ReadEntriesResultType,
   TileEntryType,
@@ -9,7 +15,10 @@ import type {
 import { Store } from "../lib/Store";
 import { readdirSync, type Dirent } from "node:fs";
 import { Navigator } from "../lib/Navigator";
+import { Create } from "../lib/Create";
 import { Tile } from "./Tile";
+import { ContextMenu } from "./ContextMenu";
+import { PromptDialog } from "./PromptDialog";
 
 export class Explorer extends ScrollBoxRenderable {
   private tiles: TileEntryType[] = [];
@@ -22,6 +31,12 @@ export class Explorer extends ScrollBoxRenderable {
     this.contentOptions = {
       flexDirection: "row",
       flexWrap: "wrap",
+    };
+
+    this.onMouseDown = (event: MouseEvent): void => {
+      if (event.button === 2) {
+        this.showContextMenu(event);
+      }
     };
 
     this.refresh();
@@ -180,6 +195,62 @@ export class Explorer extends ScrollBoxRenderable {
     }
   }
 
+  private showContextMenu(event: MouseEvent): void {
+    new ContextMenu(this.ctx, { items: this.makeCreateMenuItems() }).show(
+      event.x,
+      event.y,
+    );
+  }
+
+  private makeCreateMenuItems(): ContextMenuItemType[] {
+    return [
+    { separator: true },
+      {
+        label: "📄 New File",
+        onSelect: (): void => {
+          this.promptCreate(
+            "New File",
+            (name: string) => {
+              Create.file(join(Store.currentPath, name));
+            },
+          );
+        },
+      },
+      {
+        label: "📁 New Folder",
+        onSelect: (): void => {
+          this.promptCreate(
+            "New Folder",
+            (name: string) => {
+              Create.folder(join(Store.currentPath, name));
+            },
+          );
+        },
+      },
+      { separator: true },
+    ];
+  }
+
+  private promptCreate(
+    title: string,
+    create: (name: string) => void,
+  ): void {
+    const dialog = new PromptDialog(this.ctx);
+
+    Store.setCurrentPromptDialog(dialog);
+
+    dialog.show({
+      title,
+      label: "Name",
+      confirmLabel: "Create",
+      onConfirm: (name: string): void => {
+        create(name);
+
+        this.refresh();
+      },
+    });
+  }
+
   private makeTile(
     label: string,
     icon: string,
@@ -198,6 +269,9 @@ export class Explorer extends ScrollBoxRenderable {
         Navigator.go(fullPath);
       },
       onDeleted: (): void => {
+        this.refresh();
+      },
+      onCreated: (): void => {
         this.refresh();
       },
     });
