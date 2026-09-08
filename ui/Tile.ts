@@ -16,8 +16,6 @@ import { Delete } from "../lib/Delete";
 import { Input } from "../lib/Input";
 import { ContextMenu } from "./ContextMenu";
 import { ConfirmDialog } from "./ConfirmDialog";
-// import folderImage from "../assets/folder.png";
-// import fileImage from "../assets/file.png";
 
 export interface Options extends BoxOptions {
   label: string;
@@ -52,16 +50,11 @@ export class Tile extends BoxRenderable {
 
     this.width = config.explorer.tile_width;
     this.height = config.explorer.tile_height;
-    // this.border = true;
-    // this.borderStyle = config.border_style;
-    // this.borderColor = config.theme.border;
     this.flexDirection = "column";
     this.alignItems = "center";
     this.justifyContent = "center";
-    // this.gap = 1;
 
     this.onMouseOver = (): void => {
-      // this.borderColor = config.theme.border_selected;
       if (Store.selectedTile !== this) {
         this.backgroundColor = config.theme.sidebar;
       }
@@ -69,7 +62,6 @@ export class Tile extends BoxRenderable {
 
     this.onMouseOut = (): void => {
       if (Store.selectedTile !== this) {
-        // this.borderColor = config.theme.border;
         this.backgroundColor = undefined;
       }
     };
@@ -114,10 +106,17 @@ export class Tile extends BoxRenderable {
     }
   }
 
+  public select(): void {
+    if (Store.selectedTile !== null && Store.selectedTile !== this) {
+      (Store.selectedTile as Tile).setSelected(false);
+    }
+
+    this.setSelected(true);
+
+    Store.setSelectedTile(this);
+  }
+
   public setSelected(selected: boolean): void {
-    // this.borderColor = selected
-    //   ? config.theme.border_selected
-    //   : config.theme.border;
     this.backgroundColor = selected
       ? config.theme.selected_background
       : undefined;
@@ -176,22 +175,6 @@ export class Tile extends BoxRenderable {
         },
       },
     ];
-
-    // if (this.isDir) {
-    //   items.push({
-    //     label: "❔ Details",
-    //     onSelect: (): void => {
-    //       Store.showDetails(this.ctx);
-    //     },
-    //   });
-    // } else {
-    //   items.push({
-    //     label: "👁️ Preview",
-    //     onSelect: (): void => {
-    //       Store.showPreview(this.ctx);
-    //     },
-    //   });
-    // }
 
     new ContextMenu(this.ctx, { items }).show(event.x, event.y);
   }

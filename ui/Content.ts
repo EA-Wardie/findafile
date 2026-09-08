@@ -13,15 +13,9 @@ export class Content extends BoxRenderable {
 
     this.height = "100%";
     this.backgroundColor = config.theme.content;
-    // this.border = true;
     this.border = ["right", "left"];
-    // this.borderStyle = config.border_style;
-    // this.borderColor = config.theme.border;
     this.borderColor = config.theme.border;
-    // this.title = "Explorer";
-    // this.titleColor = config.theme.foreground;
     this.flexDirection = "column";
-    // this.flexGrow = 1;
   }
 
   public makeHeader() {

@@ -12,6 +12,5 @@ export class Main extends BoxRenderable {
     this.width = "100%";
     this.flexGrow = 1;
     this.flexDirection = "row";
-    // this.gap = 1;
   }
 }

@@ -3,24 +3,18 @@ double_click_delay = 400
 
 [explorer]
 tile_width = 15
-# tile_height = 5
 tile_height = 4
 
 
 [theme]
 background = "#1a1b26"
-# foreground = "#c0caf5"
 foreground = "#fafafa"
 header = "#262626"
 sidebar = "#262626"
 content = "#171717"
 footer = "#262626"
 selected_background = "#fafafa4D"
-# selected_foreground = "#c0caf5"
-# border = "#414868"
-# border = "#fafafa4d"
 border = "#404040"
-# border_selected = "#c0caf5"
 border_selected = "#fafafa"
 border_muted = "#737373"
 

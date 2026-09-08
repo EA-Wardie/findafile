@@ -1,11 +1,14 @@
 import config from "../config.toml";
 import {
   BoxRenderable,
+  MouseEvent,
   TextRenderable,
   type BoxOptions,
   type RenderContext,
 } from "@opentui/core";
 import type { ShortcutType } from "../types";
+import { Navigator } from "../lib/Navigator";
+import { Store } from "../lib/Store";
 
 export interface Options extends BoxOptions {
   shortcut: ShortcutType;
@@ -27,5 +30,34 @@ export class Shortcut extends BoxRenderable {
         selectable: false,
       }),
     );
+
+    this.onMouseOver = (): void => {
+      if (Store.currentPath !== this.id) {
+        this.backgroundColor = config.theme.content;
+      }
+    };
+
+    this.onMouseOut = (): void => {
+      if (Store.currentPath !== this.id) {
+        this.backgroundColor = undefined;
+      }
+    };
+
+    this.onMouseDown = (event: MouseEvent): void => {
+      if (event.button === 0) {
+        Navigator.go(options.shortcut.path);
+      }
+    };
+
+    this.highlight(Store.currentPath);
+
+    Store.onCurrentPathChange((path: string) => {
+      this.highlight(path);
+    });
+  }
+
+  private highlight(path: string): void {
+    this.backgroundColor =
+      path === this.id ? config.theme.selected_background : undefined;
   }
 }

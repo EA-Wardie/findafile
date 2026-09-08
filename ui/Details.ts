@@ -14,19 +14,10 @@ export class Details extends BoxRenderable {
     super(ctx, options);
 
     this.id = "details";
-    // this.minWidth = 41;
     this.width = "50%";
     this.height = "100%";
-    // this.border = true;
-    // this.border = ["left"];
-    // this.borderStyle = config.border_style;
-    // this.borderColor = config.theme.border;
-    // this.borderColor = config.theme.border;
-    // this.title = "Details";
-    // this.titleColor = config.theme.foreground;
     this.backgroundColor = config.theme.content;
     this.flexDirection = "column";
-    // this.paddingX = 1;
     this.visible = false;
 
     this.refresh(Store.selectedTile);
@@ -86,13 +77,6 @@ export class Details extends BoxRenderable {
     });
 
     this.rows(tile).forEach((row) => {
-      // this.add(
-      //   new TextRenderable(this.ctx, {
-      //     content: row,
-      //     fg: config.theme.foreground,
-      //     selectable: false,
-      //   }),
-      // );
       content.add(
         new TextRenderable(this.ctx, {
           content: row,
@@ -123,8 +107,6 @@ export class Details extends BoxRenderable {
         `Permissions | ${(stats.mode & 0o777).toString(8)}`,
       ];
     } catch (error) {
-      // Store.hideDetails(this.ctx);
-
       return [`Error: ${(error as Error).message}`];
     }
   }

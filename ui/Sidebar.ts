@@ -21,9 +21,6 @@ export class Sidebar extends BoxRenderable {
     const topbar = new BoxRenderable(ctx, {
       height: 3,
       backgroundColor: config.theme.content,
-      // border: ["right", "bottom"],
-      // borderStyle: "double",
-      // justifyContent: "center",
       alignItems: "center",
     });
 
@@ -38,43 +35,34 @@ export class Sidebar extends BoxRenderable {
 
     this.add(
       new SidebarSection(ctx, {
-        // title: "Places",
         shortcuts: config.places || [],
       }),
     );
 
     this.add(
       new BoxRenderable(ctx, {
-        // title: "Bookmarks",
-        // titleColor: config.theme.foreground,
         border: ["top"],
         borderStyle: config.border_style,
         borderColor: config.theme.border,
-        // marginTop: 1,
       }),
     );
 
     this.add(
       new SidebarSection(ctx, {
-        // title: "Bookmarks",
         shortcuts: config.bookmarks || [],
       }),
     );
 
     this.add(
       new BoxRenderable(ctx, {
-        // title: "Drives",
-        // titleColor: config.theme.foreground,
         border: ["top"],
         borderStyle: config.border_style,
         borderColor: config.theme.border,
-        // marginTop: 1,
       }),
     );
 
     this.add(
       new SidebarSection(ctx, {
-        // title: "Drives",
         shortcuts: config.drives || [],
       }),
     );

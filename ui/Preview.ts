@@ -36,16 +36,8 @@ export class Preview extends BoxRenderable {
     this.id = "preview";
     this.width = "50%";
     this.height = "100%";
-    // this.border = true;
-    // this.border = ["left"];
-    // this.borderStyle = config.border_style;
-    // this.borderColor = config.theme.border;
-    // this.borderColor = config.theme.border;
-    // this.title = "Preview";
-    // this.titleColor = config.theme.foreground;
     this.backgroundColor = config.theme.content;
     this.flexDirection = "column";
-    // this.paddingX = 1;
     this.visible = false;
 
     const header = new BoxRenderable(ctx, {
@@ -92,8 +84,6 @@ export class Preview extends BoxRenderable {
 
     this.lineNumbers = new LineNumberRenderable(ctx, {
       target: this.code,
-      // minWidth: 3,
-      // paddingRight: 1,
       fg: "#6b7280",
       bg: config.theme.sidebar,
     });
@@ -104,9 +94,7 @@ export class Preview extends BoxRenderable {
       onError: (): void => Store.hidePreview(this.ctx),
     });
 
-    // this.add(this.name);
     this.add(header);
-    // this.add(this.code);
     this.add(this.lineNumbers);
     this.add(this.image);
 

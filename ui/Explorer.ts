@@ -19,11 +19,9 @@ export class Explorer extends ScrollBoxRenderable {
 
     this.width = "100%";
     this.height = "100%";
-    // this.paddingX = 1;
     this.contentOptions = {
       flexDirection: "row",
       flexWrap: "wrap",
-      // columnGap: 1,
     };
 
     this.refresh();
@@ -43,7 +41,7 @@ export class Explorer extends ScrollBoxRenderable {
     );
 
     if (currentIndex === -1) {
-      this.selectTile(this.tiles[0]!);
+      this.tiles[0]!.tile.select();
 
       return;
     }
@@ -64,7 +62,7 @@ export class Explorer extends ScrollBoxRenderable {
     }
 
     if (target !== null) {
-      this.selectTile(target);
+      target.tile.select();
     }
   }
 
@@ -117,16 +115,6 @@ export class Explorer extends ScrollBoxRenderable {
     );
   }
 
-  private selectTile(entry: TileEntryType): void {
-    if (Store.selectedTile !== null && Store.selectedTile !== entry.tile) {
-      (Store.selectedTile as Tile).setSelected(false);
-    }
-
-    entry.tile.setSelected(true);
-
-    Store.setSelectedTile(entry.tile);
-  }
-
   public refresh(): void {
     this.tiles = [];
 
@@ -143,12 +131,13 @@ export class Explorer extends ScrollBoxRenderable {
     }
 
     const parent: string = dirname(Store.currentPath);
+    let backTile: Tile | undefined;
 
     if (parent !== Store.currentPath) {
-      const upTile = this.makeTile("Back", "↩️", true, parent);
+      backTile = this.makeTile("Back", "↩️", true, parent);
 
-      this.tiles.push({ tile: upTile, fullPath: parent, isDir: true });
-      this.add(upTile);
+      this.tiles.push({ tile: backTile, fullPath: parent, isDir: true });
+      this.add(backTile);
     }
 
     if (!entries.length) {
@@ -203,7 +192,7 @@ export class Explorer extends ScrollBoxRenderable {
       isDir,
       fullPath,
       onSelect: (): void => {
-        this.selectTile({ tile, fullPath, isDir });
+        tile.select();
       },
       onOpen: (): void => {
         Navigator.go(fullPath);

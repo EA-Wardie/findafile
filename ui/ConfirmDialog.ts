@@ -24,11 +24,6 @@ export class ConfirmDialog extends BoxRenderable {
     super(ctx, options);
 
     this.id = "confirm";
-    this.minWidth = 42;
-    // this.border = true;
-    // this.borderStyle = config.border_style;
-    // this.borderColor = config.theme.border;
-    // this.backgroundColor = config.theme.background;
     this.backgroundColor = config.theme.sidebar;
     this.flexDirection = "column";
     this.paddingY = 1;
@@ -74,19 +69,13 @@ export class ConfirmDialog extends BoxRenderable {
 
     this.cancelButton = new BoxRenderable(ctx, {
       height: 1,
-      // border: true,
-      // borderStyle: config.border_style,
-      // borderColor: config.theme.border,
       backgroundColor: config.theme.content,
-      // paddingX: 2,
       alignItems: "center",
       paddingX: 1,
-      flexGrow: 1,
       onMouseOver: (): void => {
         this.cancelButton.backgroundColor = config.theme.selected_background;
       },
       onMouseOut: (): void => {
-        // this.cancelButton.backgroundColor = undefined;
         this.cancelButton.backgroundColor = config.theme.content;
       },
     });
@@ -99,19 +88,13 @@ export class ConfirmDialog extends BoxRenderable {
 
     this.confirmButton = new BoxRenderable(ctx, {
       height: 1,
-      // border: true,
-      // borderStyle: config.border_style,
-      // borderColor: config.theme.border,
       backgroundColor: config.theme.content,
-      // paddingX: 2,
       alignItems: "center",
       paddingX: 1,
-      flexGrow: 1,
       onMouseOver: (): void => {
         this.confirmButton.backgroundColor = config.theme.selected_background;
       },
       onMouseOut: (): void => {
-        // this.confirmButton.backgroundColor = undefined;
         this.confirmButton.backgroundColor = config.theme.content;
       },
     });
