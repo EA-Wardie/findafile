@@ -35,35 +35,24 @@ export class Sidebar extends BoxRenderable {
 
     this.add(
       new SidebarSection(ctx, {
+        label: "Places",
         shortcuts: config.places || [],
       }),
     );
 
     this.add(
-      new BoxRenderable(ctx, {
-        border: ["top"],
-        borderStyle: config.border_style,
-        borderColor: config.theme.border,
-      }),
-    );
-
-    this.add(
       new SidebarSection(ctx, {
+        label: "Bookmarks",
         shortcuts: config.bookmarks || [],
-      }),
-    );
-
-    this.add(
-      new BoxRenderable(ctx, {
-        border: ["top"],
-        borderStyle: config.border_style,
-        borderColor: config.theme.border,
+        marginTop: 1,
       }),
     );
 
     this.add(
       new SidebarSection(ctx, {
+        label: "Drives",
         shortcuts: config.drives || [],
+        marginTop: 1,
       }),
     );
   }
