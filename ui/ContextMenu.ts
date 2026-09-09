@@ -1,4 +1,4 @@
-import config from "../config.toml";
+import config from "../lib/Config";
 import {
   BoxRenderable,
   CliRenderer,
@@ -24,6 +24,9 @@ export class ContextMenu extends BoxRenderable {
     this.position = "absolute";
     this.minWidth = 20;
     this.backgroundColor = config.theme.sidebar;
+    this.border = true;
+    this.borderStyle = config.border_style;
+    this.borderColor = config.theme.border;
     this.flexDirection = "column";
     this.zIndex = 101;
     this.items = options.items;

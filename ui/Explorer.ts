@@ -28,9 +28,11 @@ export class Explorer extends ScrollBoxRenderable {
 
     this.width = "100%";
     this.height = "100%";
+    this.paddingX = 1;
     this.contentOptions = {
       flexDirection: "row",
       flexWrap: "wrap",
+      columnGap: 1,
     };
 
     this.onMouseDown = (event: MouseEvent): void => {
@@ -163,7 +165,7 @@ export class Explorer extends ScrollBoxRenderable {
 
     entries.forEach((entry) => {
       const fullPath: string = join(Store.currentPath, entry.name);
-      const icon = entry.isDir ? "📁" : "📄";
+      const icon = entry.isDir ? "🗂️" : "📄";
 
       const tile = this.makeTile(entry.name, icon, entry.isDir, fullPath);
 
@@ -204,37 +206,34 @@ export class Explorer extends ScrollBoxRenderable {
 
   private makeCreateMenuItems(): ContextMenuItemType[] {
     return [
-    { separator: true },
       {
         label: "📄 New File",
         onSelect: (): void => {
-          this.promptCreate(
-            "New File",
-            (name: string) => {
-              Create.file(join(Store.currentPath, name));
-            },
-          );
+          this.promptCreate("New File", (name: string) => {
+            Create.file(join(Store.currentPath, name));
+          });
         },
       },
       {
         label: "📁 New Folder",
         onSelect: (): void => {
-          this.promptCreate(
-            "New Folder",
-            (name: string) => {
-              Create.folder(join(Store.currentPath, name));
-            },
-          );
+          this.promptCreate("New Folder", (name: string) => {
+            Create.folder(join(Store.currentPath, name));
+          });
         },
       },
       { separator: true },
+      {
+        label: "❔ Details",
+        onSelect: (): void => {
+          Store.hidePreview(this.ctx);
+          Store.showDetails(this.ctx);
+        },
+      },
     ];
   }
 
-  private promptCreate(
-    title: string,
-    create: (name: string) => void,
-  ): void {
+  private promptCreate(title: string, create: (name: string) => void): void {
     const dialog = new PromptDialog(this.ctx);
 
     Store.setCurrentPromptDialog(dialog);

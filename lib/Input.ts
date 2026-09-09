@@ -1,4 +1,4 @@
-import config from "../config.toml";
+import config from "./Config";
 import { Store } from "./Store";
 
 export class Input {

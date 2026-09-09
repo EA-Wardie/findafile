@@ -1,4 +1,4 @@
-import config from "../config.toml";
+import config from "../lib/Config";
 import { basename } from "node:path";
 import { statSync, type Stats } from "node:fs";
 import {
@@ -16,7 +16,6 @@ export class Details extends BoxRenderable {
     this.id = "details";
     this.width = "50%";
     this.height = "100%";
-    this.backgroundColor = config.theme.content;
     this.flexDirection = "column";
     this.visible = false;
 
@@ -32,12 +31,13 @@ export class Details extends BoxRenderable {
       this.remove(child);
     });
 
-    const path: string = tile?.id || "";
+    const path: string = tile?.id || Store.currentPath;
 
     const header = new BoxRenderable(this.ctx, {
-      height: 3,
-      backgroundColor: config.theme.header,
-      paddingX: 2,
+      paddingLeft: 1,
+      border: ["top", "bottom"],
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
@@ -73,7 +73,7 @@ export class Details extends BoxRenderable {
 
     const content = new BoxRenderable(this.ctx, {
       width: "100%",
-      padding: 1,
+      paddingX: 1,
     });
 
     this.rows(tile).forEach((row) => {
@@ -90,7 +90,7 @@ export class Details extends BoxRenderable {
   }
 
   private rows(tile: BoxRenderable | null): string[] {
-    const path: string = tile?.id || "";
+    const path: string = tile?.id || Store.currentPath;
 
     try {
       const stats: Stats = statSync(path);

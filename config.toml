@@ -7,7 +7,7 @@ tile_height = 4
 
 
 [theme]
-background = "#1a1b26"
+background = "#171717"
 foreground = "#fafafa"
 header = "#262626"
 sidebar = "#262626"
@@ -17,6 +17,7 @@ selected_background = "#fafafa4D"
 border = "#404040"
 border_selected = "#fafafa"
 border_muted = "#737373"
+highlight = "#262626"
 
 [[places]]
 path = "/home/edward"
@@ -26,32 +27,32 @@ icon = "🏠"
 [[places]]
 path = "/home/edward/Desktop"
 label = "Desktop"
-icon = "📁"
+icon = "🗂️"
 
 [[places]]
 path = "/home/edward/Downloads"
 label = "Downloads"
-icon = "📁"
+icon = "🗂️"
 
 [[places]]
 path = "/home/edward/Documents"
 label = "Documents"
-icon = "📁"
+icon = "🗂️"
 
 [[places]]
 path = "/home/edward/Music"
 label = "Music"
-icon = "📁"
+icon = "🗂️"
 
 [[places]]
 path = "/home/edward/Videos"
 label = "Videos"
-icon = "📁"
+icon = "🗂️"
 
 [[places]]
 path = "/home/edward/Pictures"
 label = "Pictures"
-icon = "📁"
+icon = "🗂️"
 
 [[places]]
 path = "/home/edward/.local/share/Trash/files"
@@ -61,12 +62,12 @@ icon = "🗑️"
 [[bookmarks]]
 path = "/home/edward/Projects"
 label = "Projects"
-icon = "🏷️"
+icon = "🗃️"
 
 [[bookmarks]]
 path = "/home/edward/Certificates"
 label = "Certificates"
-icon = "🏷️"
+icon = "🗃️"
 
 [[drives]]
 path = "/"

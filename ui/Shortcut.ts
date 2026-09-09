@@ -1,4 +1,4 @@
-import config from "../config.toml";
+import config from "../lib/Config";
 import {
   BoxRenderable,
   MouseEvent,
@@ -33,7 +33,8 @@ export class Shortcut extends BoxRenderable {
 
     this.onMouseOver = (): void => {
       if (Store.currentPath !== this.id) {
-        this.backgroundColor = config.theme.content;
+        // this.backgroundColor = config.theme.content;
+        this.backgroundColor = config.theme.highlight;
       }
     };
 
@@ -58,6 +59,7 @@ export class Shortcut extends BoxRenderable {
 
   private highlight(path: string): void {
     this.backgroundColor =
+      // path === this.id ? config.theme.selected_background : undefined;
       path === this.id ? config.theme.selected_background : undefined;
   }
 }

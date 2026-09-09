@@ -1,8 +1,6 @@
-import config from "../config.toml";
+import config from "../lib/Config";
 import {
-  ASCIIFontRenderable,
   BoxRenderable,
-  RGBA,
   TextRenderable,
   type BoxOptions,
   type RenderContext,
@@ -15,44 +13,51 @@ export class Sidebar extends BoxRenderable {
 
     this.minWidth = 24;
     this.height = "100%";
-    this.backgroundColor = config.theme.sidebar;
     this.flexDirection = "column";
 
-    const topbar = new BoxRenderable(ctx, {
-      height: 3,
-      backgroundColor: config.theme.content,
+    const header = new BoxRenderable(ctx, {
+      border: ["top", "bottom"],
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
+      justifyContent: "center",
       alignItems: "center",
     });
 
-    topbar.add(
-      new ASCIIFontRenderable(ctx, {
-        text: "FAF",
-        font: "tiny",
+    header.add(
+      new TextRenderable(ctx, {
+        content: "🔰 Find-A-File",
       }),
     );
 
-    this.add(topbar);
+    this.add(header);
 
     this.add(
       new SidebarSection(ctx, {
-        label: "Places",
         shortcuts: config.places || [],
       }),
     );
 
-    this.add(
-      new SidebarSection(ctx, {
-        label: "Bookmarks",
-        shortcuts: config.bookmarks || [],
-        marginTop: 1,
-      }),
-    );
+    this.add(new BoxRenderable(ctx, {
+      border: ["top"],
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
+    }));
 
     this.add(
       new SidebarSection(ctx, {
-        label: "Drives",
+        shortcuts: config.bookmarks || [],
+      }),
+    );
+
+    this.add(new BoxRenderable(ctx, {
+      border: ["top"],
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
+    }));
+
+    this.add(
+      new SidebarSection(ctx, {
         shortcuts: config.drives || [],
-        marginTop: 1,
       }),
     );
   }

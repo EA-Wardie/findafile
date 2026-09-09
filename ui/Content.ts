@@ -1,4 +1,5 @@
-import config from "../config.toml";
+import config from "../lib/Config";
+import { homedir } from "node:os";
 import {
   BoxRenderable,
   TextRenderable,
@@ -12,7 +13,6 @@ export class Content extends BoxRenderable {
     super(ctx, options);
 
     this.height = "100%";
-    this.backgroundColor = config.theme.content;
     this.border = ["right", "left"];
     this.borderColor = config.theme.border;
     this.flexDirection = "column";
@@ -20,20 +20,21 @@ export class Content extends BoxRenderable {
 
   public makeHeader() {
     const header = new BoxRenderable(this.ctx, {
-      height: 3,
-      backgroundColor: config.theme.header,
+      border: ["top", "bottom"],
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
+      paddingX: 1,
       justifyContent: "center",
-      alignItems: "center",
     });
 
     const headerText = new TextRenderable(this.ctx, {
-      content: Store.currentPath,
+      content: `${this.getCurrentPathIcon(Store.currentPath)}${Store.currentPath}`,
     });
 
     header.add(headerText);
 
     Store.onCurrentPathChange((path: string) => {
-      headerText.content = path;
+      headerText.content = `${this.getCurrentPathIcon(Store.currentPath)}${path}`;
     });
 
     this.add(header);
@@ -41,8 +42,9 @@ export class Content extends BoxRenderable {
 
   public makeFooter() {
     const footer = new BoxRenderable(this.ctx, {
-      height: 3,
-      backgroundColor: config.theme.header,
+      border: ["top", "bottom"],
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
       justifyContent: "center",
       alignItems: "center",
     });
@@ -55,5 +57,15 @@ export class Content extends BoxRenderable {
     footer.add(footerText);
 
     this.add(footer);
+  }
+
+  private getCurrentPathIcon(path: string) {
+    let icon = "💾";
+
+    if (Store.currentPath.startsWith(homedir())) {
+      icon = "🏠";
+    }
+
+    return icon;
   }
 }

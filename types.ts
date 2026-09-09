@@ -54,6 +54,37 @@ export interface PromptDialogOptionsType {
 
 export type ArrowDirectionType = "up" | "down" | "left" | "right";
 
+export interface ThemeType {
+  background: string;
+  foreground: string;
+  header: string;
+  sidebar: string;
+  content: string;
+  footer: string;
+  selected_background: string;
+  border: string;
+  border_selected: string;
+  border_muted: string;
+  highlight: string;
+}
+
+export interface ExplorerConfigType {
+  tile_width: number;
+  tile_height: number;
+}
+
+export type BorderStyleType = "single" | "double" | "rounded" | "heavy";
+
+export interface ConfigType {
+  border_style: BorderStyleType;
+  double_click_delay: number;
+  explorer: ExplorerConfigType;
+  theme: ThemeType;
+  places: ShortcutType[];
+  bookmarks: ShortcutType[];
+  drives: ShortcutType[];
+}
+
 export interface TileEntryType {
   tile: Tile;
   fullPath: string;

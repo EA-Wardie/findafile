@@ -1,4 +1,4 @@
-import config from "../config.toml";
+import config from "../lib/Config";
 import {
   BoxRenderable,
   CliRenderer,
@@ -26,9 +26,11 @@ export class ConfirmDialog extends BoxRenderable {
     this.id = "confirm";
     this.minWidth = 44;
     this.backgroundColor = config.theme.sidebar;
+    this.border = true;
+    this.borderStyle = config.border_style;
+    this.borderColor = config.theme.border;
     this.flexDirection = "column";
-    this.paddingY = 1;
-    this.paddingX = 2;
+    this.paddingX = 1;
     this.gap = 1;
     this.zIndex = 101;
 
@@ -70,7 +72,7 @@ export class ConfirmDialog extends BoxRenderable {
 
     this.cancelButton = new BoxRenderable(ctx, {
       height: 1,
-      backgroundColor: config.theme.content,
+      backgroundColor: config.theme.background,
       alignItems: "center",
       paddingX: 1,
       onMouseOver: (): void => {

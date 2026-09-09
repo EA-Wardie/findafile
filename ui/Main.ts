@@ -1,3 +1,4 @@
+import config from "../lib/Config";
 import {
   BoxRenderable,
   type BoxOptions,
@@ -10,6 +11,7 @@ export class Main extends BoxRenderable {
 
     this.id = "main";
     this.width = "100%";
+    this.backgroundColor = config.theme.background;
     this.flexGrow = 1;
     this.flexDirection = "row";
   }

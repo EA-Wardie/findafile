@@ -1,4 +1,4 @@
-import config from "../config.toml";
+import config from "../lib/Config";
 import { basename, extname } from "node:path";
 import { readFileSync } from "node:fs";
 import {
@@ -37,14 +37,14 @@ export class Preview extends BoxRenderable {
     this.id = "preview";
     this.width = "50%";
     this.height = "100%";
-    this.backgroundColor = config.theme.content;
     this.flexDirection = "column";
     this.visible = false;
 
     const header = new BoxRenderable(ctx, {
-      height: 3,
-      backgroundColor: config.theme.header,
-      paddingX: 2,
+      paddingLeft: 1,
+      border: ["top", "bottom"],
+      borderStyle: config.border_style,
+      borderColor: config.theme.border,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
@@ -93,8 +93,7 @@ export class Preview extends BoxRenderable {
 
     this.lineNumbers = new LineNumberRenderable(ctx, {
       target: this.code,
-      fg: "#6b7280",
-      bg: config.theme.sidebar,
+      fg: config.theme.border,
     });
 
     this.add(this.image);

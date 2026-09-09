@@ -1,4 +1,4 @@
-import config from "../config.toml";
+import config from "../lib/Config";
 import { basename, join } from "node:path";
 import {
   BoxRenderable,
@@ -38,7 +38,7 @@ export class Tile extends BoxRenderable {
     ctx: RenderContext,
     options: Options = {
       label: "",
-      icon: "📁",
+      icon: "🗂️",
       isDir: false,
     },
   ) {
@@ -53,19 +53,22 @@ export class Tile extends BoxRenderable {
 
     this.width = config.explorer.tile_width;
     this.height = config.explorer.tile_height;
+    this.border = true;
+    this.borderStyle = config.border_style;
+    this.borderColor = config.theme.border;
     this.flexDirection = "column";
     this.alignItems = "center";
     this.justifyContent = "center";
 
     this.onMouseOver = (): void => {
       if (Store.selectedTile !== this) {
-        this.backgroundColor = config.theme.sidebar;
+        this.borderColor = config.theme.foreground;
       }
     };
 
     this.onMouseOut = (): void => {
       if (Store.selectedTile !== this) {
-        this.backgroundColor = undefined;
+        this.borderColor = config.theme.border;
       }
     };
 
@@ -129,9 +132,7 @@ export class Tile extends BoxRenderable {
   }
 
   public setSelected(selected: boolean): void {
-    this.backgroundColor = selected
-      ? config.theme.selected_background
-      : undefined;
+    this.borderColor = selected ? config.theme.foreground : config.theme.border;
   }
 
   private showContextMenu(
@@ -141,7 +142,6 @@ export class Tile extends BoxRenderable {
     onCreated?: () => void,
   ): void {
     const items: ContextMenuItemType[] = [
-    { separator: true },
       {
         label: "📄 New File",
         onSelect: (): void => {
@@ -200,15 +200,17 @@ export class Tile extends BoxRenderable {
           Store.showDetails(this.ctx);
         },
       },
-      {
+    ];
+
+    if (!this.isDir) {
+      items.push({
         label: "👁️ Preview",
         onSelect: (): void => {
           Store.hideDetails(this.ctx);
           Store.showPreview(this.ctx);
         },
-      },
-      { separator: true },
-    ];
+      });
+    }
 
     new ContextMenu(this.ctx, { items }).show(event.x, event.y);
   }
@@ -220,7 +222,7 @@ export class Tile extends BoxRenderable {
 
     dialog.show({
       title,
-      label: "Name",
+      label: `Enter a ${title.toLowerCase()} name`,
       confirmLabel: "Create",
       onConfirm: create,
     });
